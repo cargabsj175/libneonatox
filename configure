@@ -1,0 +1,64 @@
+#! /bin/sh
+#=========================================================#
+# Ejecutar ./configure
+# Libreria para Vegnux NeonatoX OS
+# Proyecto Venezolano VegnuX <http://www.vegnux.org.ve>
+# Por:
+# Carlos Sánchez <mkl.vegnux@gmail.com>
+# Nehemias Velasquez <nehe009@gmail.com>
+# 2007 - 2011
+# GPLv3
+# This program comes with ABSOLUTELY NO WARRANTY.
+#=========================================================#
+# Identity of this package.
+PACKAGE_NAME='libneonatox'
+PACKAGE_TARNAME='libneonatox'
+PACKAGE_VERSION='0.6.1'
+PACKAGE_STRING='libneonatox-0.6.1'
+PACKAGE_BUGREPORT='nehe009@gmail.com'
+
+default_prefix="/usr"
+default_libdir="${default_prefix}/lib"
+
+echo $PACKAGE_STRING
+echo "Directorios de instalacion por defecto:"
+echo $default_prefix
+echo $default_libdir
+
+INSTALL_DIR=$default_prefix
+LIBDIR=$default_libdir
+SHELL=/bin/bash
+MODE=754
+DIRMODE=755
+CONFMODE=644
+
+cat << EOT > Makefile
+create-dirs:
+	install -d -m ${DIRMODE} ${INSTALL_DIR}/share/doc/$PACKAGE_NAME
+	install -d -m ${DIRMODE} ${INSTALL_DIR}/share/pixmaps
+	install -d -m ${DIRMODE} ${INSTALL_DIR}/share/applications
+	install -d -m ${DIRMODE} ${INSTALL_DIR}/bin
+	install -d -m ${DIRMODE} ${LIBDIR}/$PACKAGE_NAME
+	install -d -m ${DIRMODE} ${INSTALL_DIR}/share/$PACKAGE_NAME
+	
+all : create-dirs
+	install -m ${MODE} scripts/*	${INSTALL_DIR}/bin
+	install -m ${MODE} lib/*	${LIBDIR}/$PACKAGE_NAME
+	install -m ${MODE} AUTHORS	${INSTALL_DIR}/share/doc/$PACKAGE_NAME
+	install -m ${MODE} COPYING	${INSTALL_DIR}/share/doc/$PACKAGE_NAME
+	install -m ${MODE} NEWS	${INSTALL_DIR}/share/doc/$PACKAGE_NAME
+	install -m ${MODE} THANKS	${INSTALL_DIR}/share/doc/$PACKAGE_NAME
+		
+install : all
+
+.PHONY:
+	create-dirs all install
+
+EOT
+
+echo "Makefile generado correctamente, Para instalar escriba 'make install'"
+
+#install -m ${MODE} data/*.desktop	${INSTALL_DIR}/share/applications
+#install -m ${MODE} data/*.png	${INSTALL_DIR}/share/pixmaps
+#install -m ${MODE} doc/*	${INSTALL_DIR}/share/doc/$PACKAGE_NAME
+

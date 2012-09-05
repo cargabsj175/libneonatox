@@ -1,0 +1,171 @@
+#! /bin/sh
+#=========================================================#
+# /usr/bin/addnewuser
+# Libreria para Vegnux NeonatoX OS
+# Proyecto Venezolano VegnuX <http://www.vegnux.org.ve>
+# Por:
+# Carlos Sánchez <mkl.vegnux@gmail.com>
+# Nehemias Velasquez <nehe009@gmail.com>
+# 2007 - 2011
+# GPLv3
+# This program comes with ABSOLUTELY NO WARRANTY.
+#=========================================================#
+#===============Inicio de Programa=================#
+#Check if running as root.
+if [[ "${UID}" != "0" ]]; then
+	echo "No eres usuario Root" 
+	exit 1
+fi
+#Carga archivo de configuracion.
+prefix="/usr/lib"
+neonatoxutils_conf="${prefix}/libneonatox/libneonatox.conf"
+if [[ -e "${neonatoxutils_conf}" ]]; then
+	source "${neonatoxutils_conf}" 2> /dev/null
+else
+	echo " * No existe ${neonatoxutils_conf} *"
+fi
+neonatoxutils_functions="${prefix}/libneonatox/libneonatoxtools"
+if [[ -e "${neonatoxutils_functions}" ]]; then
+	source "${neonatoxutils_functions}" 2> /dev/null
+else
+	echo " * No existe ${neonatoxutils_functions} *"
+fi
+
+#Chequea si el UID ya existe.
+function check_login_uid() 
+{
+if [[ $(grep -v "^$" "${passwd_file}" | awk -F':' '{print $3}' | grep "^${LOGIN_UID}$" 2>/dev/null) ]]; then
+	LOGIN_UID=$(expr "${LOGIN_UID}" + "1") 
+	check_login_uid
+fi
+
+ok_fail "Error chequeando UID"
+}
+
+#Crea nuevo usuario basico.
+function nuevo_usuario_basico() {
+
+		LOGIN_NAME="$1"
+		NEWPASSUSER="$2"
+		LOGIN_UID="${GROUP}"
+		check_login_uid
+		LOGIN_GROUP="${DEFAULT_GRUOP}"
+		LOGIN_HOME="${DIR_HOME}/${LOGIN_NAME}"
+		LOGIN_SHELL="${SHELL}"
+		LOGIN_EXPIRE="${EXPIRE}"
+		
+cat << EOF
+El Nuevo Usuario se creara con los siguientes Datos.
+ -------------------------------------------------------
+| Nombre de Login........: "${LOGIN_NAME}"
+| Usuario ID (UID).......: "${LOGIN_UID}"
+| Grupo Inicial..........: "${LOGIN_GROUP}"
+| Directorio Home........: "${LOGIN_HOME}"
+| Grupos Adicionales.....: "${ADITIONAL_GRUOPS}"
+| Shell de Usuario.......: "${LOGIN_SHELL}"
+| Fecha de Expiracion....: "${LOGIN_EXPIRE}"
+ -------------------------------------------------------
+ 
+EOF
+#Crear usuario con el comando useradd.
+useradd -m -k "${SKEL}" -u "${LOGIN_UID}" -g "${LOGIN_GROUP}" -G "${ADITIONAL_GRUOPS}" -d "${LOGIN_HOME}" -s "${LOGIN_SHELL}" -e "${LOGIN_EXPIRE}" "${LOGIN_NAME}"
+echo "$LOGIN_NAME:$NEWPASSUSER" | chpasswd 2> /dev/null
+
+ok_fail "Error creando usuario basico"
+}		
+
+
+#Crea nuevo usuario avanzado.
+function nuevo_usuario_avanzado() 
+{
+LOGIN_NAME="$1"
+NEWPASSUSER="$2"
+
+LOGIN_UID="$3"
+check_login_uid
+LOGIN_GROUP="$4"
+LOGIN_HOME="$5"
+LOGIN_SHELL="$6"
+LOGIN_EXPIRE="$7"
+ADITIONAL_GRUOPS="$8"
+
+cat << EOF
+
+El Nuevo Usuario se creara con los siguientes Datos por defecto.
+ -------------------------------------------------------
+| Nombre de Login........: "${LOGIN_NAME}"
+| Usuario ID (UID).......: "${LOGIN_UID}"
+| Grupo Inicial..........: "${LOGIN_GROUP}"
+| Directorio Home........: "${LOGIN_HOME}"
+| Grupos Adicionales.....: "${ADITIONAL_GRUOPS}"
+| Shell de Usuario.......: "${LOGIN_SHELL}"
+| Fecha de Expiracion....: "${LOGIN_EXPIRE}"
+ -------------------------------------------------------
+
+EOF
+
+#Crea usuario con el comando useradd.
+useradd -m -k "${SKEL}" -u "${LOGIN_UID}" -g "${LOGIN_GROUP}" -G "${ADITIONAL_GRUOPS}" -d "${LOGIN_HOME}" -s "${LOGIN_SHELL}" -e "${LOGIN_EXPIRE}" "${LOGIN_NAME}"
+echo "$LOGIN_NAME:$NEWPASSUSER" | chpasswd
+
+ok_fail "Error creando usuario avanzado"
+}
+
+
+
+#inicio de programa
+#-----------------------------------------------------------------------------------------------#
+OPCION1=$1
+OPCION2=$2
+OPCION3=$3
+
+	case $OPCION1 in
+		-b)  #si viene con parametros se chequean de que existen
+		if [ "$OPCION2" = "" ]; then
+			echo "Falta el nombre de usuario"	
+			exit 1
+		fi
+		if [ "$OPCION3" = "" ]; then
+			echo "Falta la contraseña de usuario"	
+			exit 1
+		fi
+		nuevo_usuario_basico $OPCION2 $OPCION3
+		;;
+		-e) #asistente basico
+			while [[ -z "${LOGIN}" ]]; do
+				echo -n "Introduzca el nombre del nuevo usuario: "
+				read LOGIN
+				#Chequear si usuario existe, numeros o simbolo raros.
+				if [[ $(grep "^${LOGIN}" "${passwd_file}" 2> /dev/null) ]]; then
+					echo "$red El nombre de usuario '${LOGIN}' ya existe. Introduzca otro nuevamente. $normal"
+					unset LOGIN				
+				elif [[ $(echo "${LOGIN}" | grep "^[0-9]" 2> /dev/null) ]]; then
+					echo "$red El nombre de usuario no puede tener numeros. Introduzca otro nuevamente. $normal"
+					unset LOGIN			
+				elif [[ $(echo "${LOGIN}" | grep "\." 2> /dev/null) ]]; then
+					echo "$red El nombre de usuario '${LOGIN}' tiene simbolos invalidos. Introduzca otro nuevamente. $normal"
+					unset LOGIN
+				fi
+			done
+			while [[ -z "${NEWPASS}" ]]; do
+				echo -n "Introduzca la contraseña del usuario '$LOGIN' : "
+				read NEWPASS
+			done
+		nuevo_usuario_basico $LOGIN $NEWPASS
+		;;
+		* | -h)  #ayuda del comando
+cat << EOF
+Comando: addnewuser Version: $version
+	* Necesitas introducir alguna opcion *
+Opciones:
+  -e                 Asistente basico para crear un nuevo usuario.
+  -b                 Crea usuario sin asistente.
+  Ejemplo: addnewuser -b nombredeusuario contraseñadeusuario
+
+EOF
+		
+		;;
+	esac
+
+
+

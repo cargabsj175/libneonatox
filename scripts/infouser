@@ -1,0 +1,107 @@
+#! /bin/sh
+#=========================================================#
+# /usr/bin/infouser
+# Libreria para Vegnux NeonatoX OS
+# Proyecto Venezolano VegnuX <http://www.vegnux.org.ve>
+# Por:
+# Carlos Sánchez <mkl.vegnux@gmail.com>
+# Nehemias Velasquez <nehe009@gmail.com>
+# 2007 - 2011
+# GPLv3
+# This program comes with ABSOLUTELY NO WARRANTY.
+#=========================================================#
+#===============Inicio de Programa=================#
+#Check if running as root.
+if [[ "${UID}" != "0" ]]; then
+	echo "No eres usuario Root" 
+	exit 1
+fi
+#Carga archivo de configuracion.
+prefix="/usr/lib"
+neonatoxutils_conf="${prefix}/libneonatox/libneonatox.conf"
+if [[ -e "${neonatoxutils_conf}" ]]; then
+	source "${neonatoxutils_conf}" 2> /dev/null
+else
+	echo " * No existe ${neonatoxutils_conf} *"
+fi
+neonatoxutils_functions="${prefix}/libneonatox/libneonatoxtools"
+if [[ -e "${neonatoxutils_functions}" ]]; then
+	source "${neonatoxutils_functions}" 2> /dev/null
+else
+	echo " * No existe ${neonatoxutils_functions} *"
+fi
+
+
+
+function edit_info_user() {
+
+LOGIN="$1"	
+FULL_NAME="$2"
+ROOM_NO="$3"
+chfn -f "${FULL_NAME}" -r "${ROOM_NO}" "${LOGIN}"
+
+ok_fail "Error añadiendo informacion personal"
+}		
+
+
+#inicio de programa
+#-----------------------------------------------------------------------------------------------#
+OPCION1=$1 #opcion
+OPCION2=$2 #usuario
+OPCION3=$3 #nombre completo
+OPCION4=$4 #numero de telefono
+
+	case $OPCION1 in
+		-b)  #si viene con parametros se chequean de que existen
+		if [ "$OPCION2" = "" ]; then
+			echo "Falta el nombre del usuario a editar"	
+			exit 1
+		fi
+		if [ "$OPCION3" = "" ]; then
+			echo "Falta el nombre completo del usuario"	
+			#exit 1
+		fi
+		if [ "$OPCION4" = "" ]; then
+			echo "Falta numero de telefono del usuario"	
+			#exit 1
+		fi
+		edit_info_user $OPCION2 $OPCION3 $OPCION4
+		;;
+		-e) #asistente basico
+			
+			while [[ -z "${OPCION2}" ]]; do
+				echo -n "Introduzca el nombre del usuario a editar: "
+				read OPCION2
+				#Chequear si usuario existe, numeros o simbolo raros.
+				if [[ $(grep "^${OPCION2}" "${passwd_file}" 2> /dev/null) ]]; then
+					echo "'${OPCION2}'"
+				else
+					echo "El nombre de usuario '${OPCION2}' no existe."
+					unset OPCION2		
+				fi
+			done
+			
+			echo -n "Introduzca el nombre completo del usuario: "
+			read OPCION3
+			echo -n "Introduzca el numero de telefono del usuario: "
+			read OPCION4
+			
+			
+		edit_info_user $OPCION2 $OPCION3 $OPCION4
+		;;
+		* | -h)  #ayuda del comando
+cat << EOF
+Comando: addnewuser Version: $version
+	* Necesitas introducir alguna opcion *
+Opciones:
+  -e                 Asistente basico para añadir informacion al usuario.
+  -b                 Edita informacion sin asistente.
+  Ejemplo: infouser -b nombredeusuario nombrecompleto numerodetelefono
+
+EOF
+		
+		;;
+	esac
+
+
+

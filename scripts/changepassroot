@@ -1,0 +1,52 @@
+#! /bin/sh
+#=========================================================#
+# /usr/bin/changepassroot
+# Libreria para Vegnux NeonatoX OS
+# Proyecto Venezolano VegnuX <http://www.vegnux.org.ve>
+# Por:
+# Carlos Sánchez <mkl.vegnux@gmail.com>
+# Nehemias Velasquez <nehe009@gmail.com>
+# 2007 - 2011
+# GPLv3
+# This program comes with ABSOLUTELY NO WARRANTY.
+#=========================================================#
+#===============Inicio de Programa=================#
+#Check if running as root.
+if [[ "${UID}" != "0" ]]; then
+	echo "No eres usuario Root" 
+	exit 1
+fi
+#Carga archivo de configuracion.
+prefix="/usr/lib"
+neonatoxutils_conf="${prefix}/libneonatox/libneonatox.conf"
+if [[ -e "${neonatoxutils_conf}" ]]; then
+	source "${neonatoxutils_conf}" 2> /dev/null
+else
+	echo " * No existe ${neonatoxutils_conf} *"
+fi
+neonatoxutils_functions="${prefix}/libneonatox/libneonatoxtools"
+if [[ -e "${neonatoxutils_functions}" ]]; then
+	source "${neonatoxutils_functions}" 2> /dev/null
+else
+	echo " * No existe ${neonatoxutils_functions} *"
+fi
+
+
+
+#inicio de programa
+#-----------------------------------------------------------------------------------------------#
+OPCION1=$1
+
+		if [ "$OPCION1" = "" ]; then
+			echo "Comando: changepassroot Version: $version"
+			echo "Falta la contraseña de ROOT"
+			echo "Ejemplo: changepassroot 'contraseñaderoot'"	
+			exit 1
+		fi
+		
+		echo "root:$OPCION1" | chpasswd 2> /dev/null
+		ok_fail "Error seteando contraseña de ROOT"
+		
+		
+		
+		

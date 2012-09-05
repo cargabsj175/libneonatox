@@ -1,0 +1,21 @@
+Version 0.5.3
+=============
+
+24/06/10 20:54:40
+
+Errores corregidos:
+ - Bootsplash de grub cambiado al nuevo logo de neonatox. (Carlos Sánchez)
+ - scripts/install_linux línea 148: Ajuste de permisos de $LFS/tmp a 777 (Carlos Sánchez)
+ - scripts/install_linux línea 225,226: Desactivar el arranque automático del usuario "neonatox" del livecd luego de instalar. (Carlos Sánchez) <<-- parece no funcionar pero igual allí lo dejo
+ - scripts/crear_nuevo_usuario línea 29: añadido haldaemon a los grupos por defecto de los nuevos usuarios. Esto permite a usuarios sin privilegios montar memorias USB automaticamente.
+ - Otros bugs y/o detalles corregidos. (Carlos Sánchez)
+
+
+Version 0.5.1
+=============
+
+03/06/10 11:27:52
+
+Errores corregidos:
+ - Arreglado la creación del archivo de configuración para Grub (Jaime Gil de Sagredo Luna)
+

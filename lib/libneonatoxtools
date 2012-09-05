@@ -1,0 +1,23 @@
+#=========================================================#
+# /opt/vegnux-installer/vegnux-installer.functions
+# Funciones Extras para Vegnux NeonatoX OS
+# Proyecto Venezolano VegnuX <http://www.vegnux.org.ve>
+# Por:
+# Carlos Sánchez <mkl.vegnux@gmail.com>
+# Nehemias Velasquez <nehe009@gmail.com>
+# 2007 - 2009
+# GPLv3
+# This program comes with ABSOLUTELY NO WARRANTY.
+#=========================================================#
+#-----------------Funciones Extras del Instalador---------#
+#=========================================================#
+
+#Revisa si hay un error en la salida estandar.
+function ok_fail()
+{
+	if [[ "${?}" != "0" ]]; then
+		echo "$red${1}$normal"
+		exit 1
+	fi
+}
+

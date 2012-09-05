@@ -1,0 +1,25 @@
+libneonatox
+================
+
+Install in /usr:
+===============
+
+make install
+
+Install anywere:
+================
+
+example:
+
+anywere=/opt/installer #custom dir
+make DESTDIR=${anywere} install
+
+Enjoy ;)
+
+addnewuser
+changepassroot
+findpart
+updategrub2
+infouser
+
+libneonatoxtools

@@ -1,0 +1,316 @@
+#! /bin/sh
+#=========================================================#
+# /usr/bin/findpart
+# Libreria para Vegnux NeonatoX OS
+# Proyecto Venezolano VegnuX <http://www.vegnux.org.ve>
+# Por:
+# Carlos Sánchez <mkl.vegnux@gmail.com>
+# Nehemias Velasquez <nehe009@gmail.com>
+# 2007 - 2012
+# GPLv3
+# This program comes with ABSOLUTELY NO WARRANTY.
+#=========================================================#
+
+#Carga archivo de configuracion.
+prefix="/usr/lib"
+neonatoxutils_conf="${prefix}/libneonatox/libneonatox.conf"
+if [[ -e "${neonatoxutils_conf}" ]]; then
+	source "${neonatoxutils_conf}" 2> /dev/null
+else
+	echo " * No existe ${neonatoxutils_conf} *"
+fi
+neonatoxutils_functions="${prefix}/libneonatox/libneonatoxtools"
+if [[ -e "${neonatoxutils_functions}" ]]; then
+	source "${neonatoxutils_functions}" 2> /dev/null
+else
+	echo " * No existe ${neonatoxutils_functions} *"
+fi
+
+
+#Detecta particiones del sistema.
+#Nombres de los diferentes tipos de particiones.
+function tipo_particion()
+{
+case "$tipo" in
+1)tipo_part="FAT12";;              
+2)tipo_part="XENIX root";;            
+3)tipo_part="XENIX usr";;             
+4)tipo_part="FAT16 <32M";;            
+5)tipo_part="Extended";;              
+6)tipo_part="FAT16";;                 
+7)tipo_part="HPFS/NTFS";;             
+8)tipo_part="AIX";;                   
+9)tipo_part="AIX bootable";;          
+a)tipo_part="OS/2 Boot Manager";;     
+b)tipo_part="W95 FAT32";;             
+c)tipo_part="W95 FAT32 (LBA)";;      
+e)tipo_part="W95 FAT16 (LBA)";;       
+f)tipo_part="W95 Ext'd (LBA)";;       
+10)tipo_part="OPUS";;                  
+11)tipo_part="Hidden FAT12";;          
+12)tipo_part="Compaq diagnostics";;    
+14)tipo_part="Hidden FAT16 <32M";;     
+16)tipo_part="Hidden FAT16";;          
+17)tipo_part="Hidden HPFS/NTFS";;      
+18)tipo_part="AST SmartSleep";;        
+1b)tipo_part="Hidden W95 FAT32";;      
+1c)tipo_part="Hidden W95 FAT32 (LBA)";;  
+1e)tipo_part="Hidden W95 FAT16 (LBA)";; 
+24)tipo_part="NEC DOS";;              
+39)tipo_part="Plan 9";;                
+3c)tipo_part="PartitionMagic recov";;  
+40)tipo_part="Venix 80286";;           
+41)tipo_part="PPC PReP Boot";;         
+42)tipo_part="SFS";;                   
+4d)tipo_part="QNX4.x";;                
+4e)tipo_part="QNX4.x 2nd part";;       
+4f)tipo_part="QNX4.x 3rd part";;       
+50)tipo_part="OnTrack DM";;            
+51)tipo_part="OnTrack DM6 Aux1";;      
+52)tipo_part="CP/M";;                  
+53)tipo_part="OnTrack DM6 Aux3";;      
+54)tipo_part="OnTrackDM6";;            
+55)tipo_part="EZ-Drive";;              
+56)tipo_part="Golden Bow";;            
+5c)tipo_part="Priam Edisk";;           
+61)tipo_part="SpeedStor";;             
+63)tipo_part="GNU HURD or SysV";;      
+64)tipo_part="Novell Netware 286";;    
+65)tipo_part="Novell Netware 386";;    
+70)tipo_part="DiskSecure Multi-Boot";;  
+75)tipo_part="PC/IX";;                 
+80)tipo_part="Old Minix";;
+81)tipo_part="Minix / old Linux";;     
+82)tipo_part="Linux swap";;            
+83)tipo_part="Linux";;                 
+84)tipo_part="OS/2 hidden C: drive";;  
+85)tipo_part="Linux extended";;        
+86)tipo_part="NTFS volume set";;       
+87)tipo_part="NTFS volume set";;       
+88)tipo_part="Linux plaintext";;       
+8e)tipo_part="Linux LVM";;             
+93)tipo_part="Amoeba";;                
+94)tipo_part="Amoeba BBT";;            
+9f)tipo_part="BSD/OS";;                
+a0)tipo_part="IBM Thinkpad hibernation";;  
+a5)tipo_part="FreeBSD";;               
+a6)tipo_part="OpenBSD";;               
+a7)tipo_part="NeXTSTEP";;              
+a8)tipo_part="Darwin UFS";;           
+a9)tipo_part="NetBSD";;                
+ab)tipo_part="Darwin boot";;           
+b7)tipo_part="BSDI fs";;               
+b8)tipo_part="BSDI swap";;             
+bb)tipo_part="Boot Wizard hidden";;    
+be)tipo_part="Solaris boot";;          
+bf)tipo_part="Solaris";;
+c1)tipo_part="DRDOS/sec (FAT-12)";;
+c4)tipo_part="DRDOS/sec (FAT-16)";;
+c6)tipo_part="DRDOS/sec (FAT-16)";;
+c7)tipo_part="Syrinx";;
+da)tipo_part="Non-FS data";;
+db)tipo_part="CP/M / CTOS / ...";;
+de)tipo_part="Dell Utility";;
+df)tipo_part="BootIt";;
+e1)tipo_part="DOS access";;
+e3)tipo_part="DOS R/O";;
+e4)tipo_part="SpeedStor";;
+eb)tipo_part="BeOS fs";;
+ee)tipo_part="GPT";;
+ef)tipo_part="EFI (FAT-12/16/32)";;
+f0)tipo_part="Linux/PA-RISC boot";;
+f1)tipo_part="SpeedStor";;
+f4)tipo_part="SpeedStor";;
+f2)tipo_part="DOS secondary";;
+fb)tipo_part="VMware VMFS";;
+fc)tipo_part="VMware VMKCORE";;
+fd)tipo_part="Linux raid autodetec";;
+fe)tipo_part="LANstep";;
+ff)tipo_part="BBT";;
+*)tipo_part="Desconocida";;
+esac
+}
+
+#Asigna ordena y da valores a las variables de particiones.
+function lugar_particiones() 
+{
+case $NUM in
+		0)
+		part0="$part"
+		tipo_part0="$tipo_part"
+		taman_part0="$taman_part"
+		;;
+		1)
+		part1="$part"
+		tipo_part1="$tipo_part"
+		taman_part1="$taman_part"
+		;;
+		2)
+		part2="$part"
+		tipo_part2="$tipo_part"
+		taman_part2="$taman_part"
+		;;
+		3)
+		part3="$part"
+		tipo_part3="$tipo_part"
+		taman_part3="$taman_part"
+		;;
+		4)
+		part4="$part"
+		tipo_part4="$tipo_part"
+		;;
+		5)
+		part5="$part"
+		tipo_part5="$tipo_part"
+		taman_part5="$taman_part"
+		;;
+		6)
+		part6="$part"
+		tipo_part6="$tipo_part"
+		taman_part6="$taman_part"
+		;;
+		7)
+		part7="$part"
+		tipo_part7="$tipo_part"
+		taman_part7="$taman_part"
+		;;
+		8)
+		part8="$part"
+		tipo_part8="$tipo_part"
+		taman_part8="$taman_part"
+		;;
+		9)
+		part9="$part"
+		tipo_part9="$tipo_part"
+		taman_part9="$taman_part"
+		;;
+		10)
+		part10="$part"
+		tipo_part10="$tipo_part"
+		taman_part10="$taman_part"
+		;;
+		11)
+		part11="$part"
+		tipo_part11="$tipo_part"
+		taman_part11="$taman_part"
+		;;
+		12)
+		part12="$part"
+		tipo_part12="$tipo_part"
+		taman_part12="$taman_part"
+		;;
+		13)
+		part13="$part"
+		tipo_part13="$tipo_part"
+		taman_part13="$taman_part"
+		;;
+		14)
+		part14="$part"
+		tipo_part14="$tipo_part"
+		taman_part14="$taman_part"
+		;;
+		15)
+		part15="$part"
+		tipo_part15="$tipo_part"
+		taman_part15="$taman_part"
+		;;
+		esac
+		NUM=$(expr "${NUM}" + "1") 
+}
+
+
+#Inicio de Detectar discos, particiones, formato y tamaños de particiones.
+function inicio_detectar_discos() {
+mb=MB
+gb=GB
+NUM="0"
+NUM_PART="0"
+
+#Para discos IDE
+for i in a b c d e f g
+do
+    DISCO=hd$i
+    nuevohd=$(grep "${DISCO}" "/proc/partitions")
+    if [ -n "$nuevohd" ]; then
+        for n in 1 2 3 4 5 6 7
+		do
+		part=hd$i$n
+		nuevohd=$(grep "${part}" "/proc/partitions")
+		if [ -n "$nuevohd" ]; then
+			
+			tipo=`fdisk -l | grep $part | awk '{if ($2 == "*") {print $6};}{if ($2 != "*") {print $5};}'`
+			tipo_particion
+			size=`fdisk -l /dev/$part 2>/dev/null | sed -n 's!^Disco.* \([0-9]\+\) *bytes$!\1!p'` 
+			sizeA=$(expr $size /  1073741824)
+			if [ "$sizeA" = "0" ]; then
+				sizeA=$(expr $size / 1048576 )
+				taman_part="$sizeA$mb"
+			else
+				sizeA=$(expr $size / 1073741824)
+				taman_part="$sizeA$gb"
+			fi			
+			lugar_particiones
+			res=" $part --- $tipo_part --- $taman_part\\n$res"
+			respart="$part $respart"
+			restipo="$tipo_part $restipo"
+			restaman="$taman_part $restaman"
+		fi		
+		done    
+    fi
+done
+
+#Para discos SATA & SCSI
+for i in a b c d e f g
+do
+    DISCO=sd$i
+    nuevohd=$(grep "${DISCO}" "/proc/partitions")
+    if [ -n "$nuevohd" ]; then
+        for n in 1 2 3 4 5 6 7
+		do
+		part=sd$i$n
+		nuevohd=$(grep "${part}" "/proc/partitions")
+		if [ -n "$nuevohd" ]; then
+			
+			tipo=`fdisk -l | grep $part | awk '{if ($2 == "*") {print $6};}{if ($2 != "*") {print $5};}'`
+			tipo_particion
+			size=`fdisk -l /dev/$part 2>/dev/null | sed -n 's!^Disco.* \([0-9]\+\) *bytes$!\1!p'` 
+			sizeA=$(expr $size /  1073741824)
+			if [ "$sizeA" = "0" ]; then
+				sizeA=$(expr $size / 1048576 )
+				taman_part="$sizeA$mb"
+			else
+				sizeA=$(expr $size / 1073741824)
+				taman_part="$sizeA$gb"
+			fi			
+			lugar_particiones	
+			res=" $part --- $tipo_part --- $taman_part\\n$res"
+			respart="$part $respart"
+			restipo="$tipo_part $restipo"
+			restaman="$taman_part $restaman"
+		fi		
+		done    
+    fi
+done
+#Fin de Detectar discos, particiones, formato y tamaños de particiones.
+}
+
+OPCION1=$1
+case $OPCION1 in
+		-p)  #mostrar resultados a consola de solo particiones
+		inicio_detectar_discos  2>/dev/null #
+		echo "$respart"
+		;;
+		-r)  #log en TMP
+		inicio_detectar_discos  2>/dev/null 
+		echo "$respart"  > $TMP/particiones
+		echo "$restipo"  > $TMP/tipo_part
+		echo "$restaman" > $TMP/taman_part
+		echo ""
+		;;
+		* )  #sin parametros solo muestra informacion en consola
+		echo "Comando: findpart Version: $version"
+		echo "Particiones Encontradas en su Sistema"
+		inicio_detectar_discos  2>/dev/null 
+		printf "$res"		
+		;;
+		esac
