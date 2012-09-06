@@ -1,0 +1,225 @@
+#! /bin/sh
+#=========================================================#
+# /usr/bin/neoupdate
+# Libreria para Vegnux NeonatoX OS
+# Primera implementación de actualizaciones automaticas
+# Proyecto Venezolano VegnuX <http://www.vegnux.org.ve>
+# Por:
+# Carlos Sánchez <mkl.vegnux@gmail.com>
+# Nehemias Velasquez <nehe009@gmail.com>
+# 2007 - 2012
+# GPLv3
+# This program comes with ABSOLUTELY NO WARRANTY.
+#=========================================================#
+#===============Inicio de Programa=================#
+#variables
+export neover="n0.5.1 n0.5.2 n0.5.3 n06.1 n06" # colocar las versiones a la inversa
+export workdir="$(pwd)"
+export nhofilesdir="/var/nhopkg/files"
+export neoupdatefilesdir="/tmp/neoupdate/files"
+export nhorepofilesdir="/var/nhopkg/repo/packages"
+export repourl="http://www.vegnux.org.ve/repo/06.1/stable/i686"
+
+function help(){
+	echo "neoupdate 0.2 - Proyecto VegnuX 2007-2012 (GPLv3)"
+	echo ""
+	echo "Uso: neoupdate [OPCION] ..."
+	echo ""
+	echo "-h, --help: Muestra esta información."
+	echo "-g, --gui: Obtiene información de paquetes nuevos con Interfáz GTK"
+	echo "-n, --info: Obtiene información de paquetes nuevos."
+	echo "-u, --update: Actualiza los paquetes disponibles"
+}
+
+function check_if_root_uid()
+{
+	if [[ "${UID}" != "0" ]]; then
+		echo "Necesita ser root para esta operación."
+		exit 1
+	fi
+	return 0
+}
+
+function getpkglocal(){
+# obtiene una lista de los paquetes instalados (solo nombre y version)
+cd ${nhofilesdir}
+listlocal=$(ls * )
+listlocal=$(echo $listlocal  | sed "s/.bz2//g")
+for ver in $neover
+do
+listlocal=$(echo $listlocal | sed "s/-$ver//g")
+done
+for write in $listlocal
+do
+echo $write >> ${neoupdatefilesdir}/pkglocal
+done
+cd ${workdir}
+}
+
+function updatecheck(){
+while read write
+do
+# obtiene solo el nombre sin version de los paquetes actuales
+pkgname=$(grep "# Name:" "/var/nhopkg/packages/${write}" 2> /dev/null | sed 's/# Name:	//g')
+# obtiene la version del mismo paquete pero en el repositorio
+pkgversion=$(grep "# Version:" "/var/nhopkg/repo/packages/${pkgname}" 2> /dev/null | sed 's/# Version:	//g')
+# genera una lista de los paquetes disponibles en el repositorio 
+echo "${pkgname}-${pkgversion}" >> ${neoupdatefilesdir}/pkgrepo
+done  < "${neoupdatefilesdir}/pkglocal"
+}
+
+function pkgVarGen(){
+# genera 2 variables, una de cada paquete actual (CURPKG#=) y otra de cada paquete nuevo (UPPKG#=)
+
+#paquete actual
+CURPKGLIST=$(cat "${neoupdatefilesdir}/pkglocal")
+cont=0
+for write in ${CURPKGLIST}
+do
+	cont=$(expr $cont + 1)
+echo "export CURPKG${cont}=\"${write}\"" >> /tmp/vars
+echo ${cont} >> /tmp/numbers
+done  
+
+#paquete nuevo
+UPPKGLIST=$(cat ${neoupdatefilesdir}/pkgrepo)
+cont=0
+for write in ${UPPKGLIST}
+do
+	cont=$(expr $cont + 1)
+echo "export UPPKG${cont}=\"${write}\"" >> /tmp/vars
+done 
+
+#comparando paquetes
+. /tmp/vars
+numbers=$(cat /tmp/numbers)
+for compare in $numbers
+do
+	echo "echo $(echo $\CURPKG)$compare" > /tmp/lol
+	echo "echo $(echo $\UPPKG)$compare" > /tmp/xD
+	CURPKG=$(source /tmp/lol)
+	UPPKG=$(source /tmp/xD)
+	# echo $CURPKG y $UPPKG >> /tmp/differences # para probar que compare debidamente
+	# si el paquete es igual a "-" (bug) se ignora
+	if [ "${CURPKG}" = "${UPPKG}" ]; then
+	echo ""
+	# si es diferente es una posible actualizacion
+	elif [ "${CURPKG}" != "${UPPKG}" ]; then
+	echo "${UPPKG}" >> ${neoupdatefilesdir}/pkgupdate
+	fi 
+done
+mkdir ${neoupdatefilesdir}/packages
+pkglist=$(cat ${neoupdatefilesdir}/pkgupdate)
+for touching in ${pkglist}
+do
+	touch ${neoupdatefilesdir}/packages/$touching
+done
+rm -r ${neoupdatefilesdir}/pkgupdate
+cd ${neoupdatefilesdir}/packages
+list=$(ls ?*-*[0-9]* 2> /dev/null)
+for listing in ${list}
+do
+	echo "${listing}" >> ${neoupdatefilesdir}/pkgupdate
+done
+rm -r /tmp/{vars,numbers,lol,xD}
+}
+
+function updatenotify(){
+	cont=0
+	uplist=$(cat ${neoupdatefilesdir}/pkgupdate)
+	for counting in ${uplist}
+	do
+			cont=$(expr ${cont} + 1)
+	done
+	msg1="¡GNU NeonatoX está actualizado!"
+	msg2="Existen ${cont} actualizaciones nuevas."
+}
+
+function main(){
+mkdir -p ${neoupdatefilesdir}
+echo "** Obteniendo una lista de los paquetes instalados  ..."
+getpkglocal
+updatecheck
+echo "** Verificando si existe alguna actualización ..."
+pkgVarGen
+updatenotify
+	if [ ${cont} = 0  ]; then
+		echo "** ${msg1}"
+		else
+		echo "** ${msg2}"
+		echo "Paquetes encontrados:"
+		echo "===================="
+		for list in $(cat ${neoupdatefilesdir}/pkgupdate);do
+			echo "** $list "
+		done
+		echo "===================="
+		notify-send  "${msg2} Para ejecutar la actualización, ejecute como root \"neouptate -u\" desde la terminal." -t 30000 --icon=/usr/share/pixmaps/neoupdate.png
+	fi
+}
+
+function updatepkg(){
+	check_if_root_uid
+	nhopkg -U 2> /dev/null
+    main
+	package=$(cat ${neoupdatefilesdir}/pkgupdate)
+	for installing in $package
+	do
+		nhopkg -S $installing
+	done
+	rm -r ${neoupdatefilesdir}/*
+}
+
+function mainGUI(){
+mkdir -p ${neoupdatefilesdir}
+{
+echo "20" ; sleep 1
+echo "# Obteniendo una lista de los paquetes ..." ; sleep 1
+getpkglocal
+updatecheck
+echo "50" ; sleep 1
+echo "# Verificando si existe alguna actualización disponible..." ; sleep 1
+pkgVarGen
+updatenotify
+echo "75" ; sleep 1
+echo "100"; sleep 1
+if [ ${cont} = 0  ]; then
+		echo "# ${msg1}"; sleep 1
+		else
+		echo "# ${msg2}\n\nA continuación se mostrará una lista de paquetes para actualizar. Para ejecutar la actualización, ejecute como root \"neouptate -u\"\ndesde la terminal."; sleep 1
+fi
+} |  
+zenity --progress   --title="Neoupdate 0.1" --width=440 --height=140 --percentage=0  #--text "Preparando para la actualización..."
+# muestra gráficamente una lista de los paquetes
+pkglistgtk=$(cat ${neoupdatefilesdir}/pkgupdate)
+$(zenity --list --text "Paquetes nuevos encontrados..." --title "Neoupdate 0.1" --width=440 --height=640  --column "paquete" ${pkglistgtk} | tr "|" " ")
+}
+
+if [ "$1" = "-u" ]; then
+updatepkg
+elif [ "$1" = "--update" ]; then
+updatepkg
+exit 0
+elif [ "$1" = "-n" ]; then
+main
+rm -r ${neoupdatefilesdir}/*
+exit 0
+elif [ "$1" = "--info" ]; then
+main
+rm -r ${neoupdatefilesdir}/*
+exit 0
+elif [ "$1" = "-h" ]; then
+help
+exit 0
+elif [ "$1" = "--help" ]; then
+help
+exit 0
+elif [ "$1" = "--gui" ]; then
+mainGUI
+rm -r ${neoupdatefilesdir}/*
+exit 0
+elif [ "$1" = "-g" ]; then
+mainGUI
+rm -r ${neoupdatefilesdir}/*
+exit 0
+fi
+echo "Use \"--help\" para más detalles."

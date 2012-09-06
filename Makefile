@@ -9,6 +9,7 @@ create-dirs:
 all : create-dirs
 	install -m 754 scripts/*	/usr/bin
 	install -m 754 lib/*	/usr/lib/libneonatox
+	install -m 754 icons/*	/usr/share/pixmaps
 	install -m 754 AUTHORS	/usr/share/doc/libneonatox
 	install -m 754 COPYING	/usr/share/doc/libneonatox
 	install -m 754 NEWS	/usr/share/doc/libneonatox

@@ -6,7 +6,7 @@
 # Por:
 # Carlos Sánchez <mkl.vegnux@gmail.com>
 # Nehemias Velasquez <nehe009@gmail.com>
-# 2007 - 2011
+# 2007 - 2012
 # GPLv3
 # This program comes with ABSOLUTELY NO WARRANTY.
 #=========================================================#
@@ -44,6 +44,7 @@ create-dirs:
 all : create-dirs
 	install -m ${MODE} scripts/*	${INSTALL_DIR}/bin
 	install -m ${MODE} lib/*	${LIBDIR}/$PACKAGE_NAME
+	install -m ${MODE} icons/*	${INSTALL_DIR}/share/pixmaps
 	install -m ${MODE} AUTHORS	${INSTALL_DIR}/share/doc/$PACKAGE_NAME
 	install -m ${MODE} COPYING	${INSTALL_DIR}/share/doc/$PACKAGE_NAME
 	install -m ${MODE} NEWS	${INSTALL_DIR}/share/doc/$PACKAGE_NAME
