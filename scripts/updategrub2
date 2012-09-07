@@ -10,6 +10,7 @@
 # GPLv3
 # This program comes with ABSOLUTELY NO WARRANTY.
 #=========================================================#
+
 if [[ "${UID}" != "0" ]]; then
 	echo "No eres usuario Root" 
 	exit 1
@@ -71,23 +72,29 @@ fi
 EOT
 
 
-GRUB_DRIVE="`${grub_probe} --target=drive /`"
-GRUB_DEVICE="`${grub_probe} --target=device /`"
-
-list=`for i in /boot/vmlinu[xz]-* /vmlinu[xz]-* ; do
+#chequear todos los sistemas linux.
+function check_ALL_LINUX (){
+# se utiliza udisks para mountar los discos automaticamente en sus
+# respectivos puntos de montaje para detectar la mayor cantidad de SOs posibles...
+devls=$(ls -1 /dev/disk/by-uuid/* 2> /dev/null | sed 's@/dev/disk/by-uuid/@@g')
+for mountmp in $devls; do
+	$(udisks --mount  /dev/disk/by-uuid/$mountmp) 2>/dev/null
+done
+dirlist=$(mount -l | grep ^/dev/[hs] | cut -d ' ' -f 3)
+for dir in $dirlist; do
+export dir=$dir
+list=`for i in $dir/boot/vmlinu[xz]-* /vmlinu[xz]-* ; do
         if grub_file_is_not_garbage "$i" ; then echo -n "$i " ; fi
       done`
-#Chequear por kernel.
+#Chequear por linux.
 while [ "x$list" != "x" ] ; do
   linux=`version_find_latest $list`
   echo "Encontrada imagen de Linux en: $linux" >&2
   basename=`basename $linux`
   dirname=`dirname $linux`
-  rel_dirname=`make_system_path_relative_to_its_root $dirname`
+  rel_dirname=`make_system_path_relative_to_its_root ${dirname}`
   version=`echo $basename | sed -e "s,^[^0-9]*-,,g"`
   alt_version=`echo $version | sed -e "s,\.old$,,g"`
-  
-  initrd=
   for i in "initrd.img-${version}" "initrd-${version}.img" \
 	   "initrd-${version}" "initrd.img-${alt_version}" \
 	   "initrd-${alt_version}.img" "initrd-${alt_version}"; do
@@ -102,54 +109,76 @@ while [ "x$list" != "x" ] ; do
   else
 	echo ""
   fi
+GRUB_DRIVE="`${grub_probe} --target=drive "${dir}" 2>/dev/null`"
+GRUB_DEVICE="`${grub_probe} --target=device "${dir}" 2>/dev/null`"
 
-  cat << EOF >> /boot/grub/grub.cfg 
-menuentry "$OS kernel linux-$version" {
+if [[ -f ${dir}/etc/lsb-release ]];then
+# obtiene la version del otro SO linux
+. $dir/etc/lsb-release
+cat << EOF >> /boot/grub/grub.cfg 
+menuentry "$DISTRIB_DESCRIPTION (on $GRUB_DEVICE) linux $version" --class gnu-linux --class gnu --class os {
+	insmod part_msdos
+	insmod ext2
 	set root=$GRUB_DRIVE
 	linux /boot/$basename root=$GRUB_DEVICE ro
 	$if_initrd
 }
-menuentry "$OS kernel linux-$version (recovery mode)" {
+menuentry "$DISTRIB_DESCRIPTION (recovery mode) (on $GRUB_DEVICE) linux $version" --class gnu-linux --class gnu --class os {
+	insmod part_msdos
+	insmod ext2
 	set root=$GRUB_DRIVE
 	linux /boot/$basename root=$GRUB_DEVICE ro single
 	$if_initrd
 }
 EOF
-
+else
+# si no se consigue la version se crea una entrada generica
+cat << EOF >> /boot/grub/grub.cfg 
+menuentry "GNU/Linux (on $GRUB_DEVICE) linux $version" --class gnu-linux --class gnu --class os {
+	insmod part_msdos
+	insmod ext2
+	set root=$GRUB_DRIVE
+	linux /boot/$basename root=$GRUB_DEVICE ro
+	$if_initrd
+}
+EOF
+fi
 list=`echo $list | tr ' ' '\n' | grep -vx $linux | tr '\n' ' '`
-
-
 done
+done
+}
+check_ALL_LINUX
 
-#chequear otros sistemas.
-
-dirlist=$(mount -l | grep ^/dev/[hs] | cut -d ' ' -f 3)
-#dirlist=$(findpart -r)
-for dir in $dirlist ; do
-
+#chequear otros sistemas no linux.
+function check_OSWINDOWS(){
+devls=$(ls -1 /dev/disk/by-uuid/* 2> /dev/null | sed 's@/dev/disk/by-uuid/@@g')
+for mountmp in $devls; do
+	$(udisks --mount  /dev/disk/by-uuid/$mountmp) 2>/dev/null
+done
+#dirlist=$(mount -l | grep ^/dev/[hs] | cut -d ' ' -f 3)
+for dir in /media/*?* ; do
   # Chequea para Vista/Seven bootmgr.
-  if [ -f "$dir/bootmgr" ] ; then
+  if [[ -f ${dir}/bootmgr ]] ; then
     OS_F="Microsoft Windows Vista/Seven"
-	
   # Chequea para NT/2000/XP NTLDR.
-  elif [ -f "$dir/ntldr" ] ; then
+  elif [[ -f ${dir}/ntldr ]] ; then
     OS_F="Microsoft Windows NT/2000/XP"
 	else
     continue
   fi
-
-	GRUB_DRIVE="`${grub_probe} --target=drive $dir`"
-	GRUB_DEVICE="`${grub_probe} --target=device $dir`"
+	GRUB_DRIVE="`${grub_probe} --target=drive "${dir}" 2>/dev/null`"
+	GRUB_DEVICE="`${grub_probe} --target=device "${dir}" 2>/dev/null`"
 	echo "Encontrado $OS_F en $GRUB_DEVICE $GRUB_DRIVE" >&2
- 
-  cat << EOF >> /boot/grub/grub.cfg 
-menuentry "$OS_F" {
+cat << EOF >> /boot/grub/grub.cfg 
+menuentry "$OS_F (on $GRUB_DEVICE)" --class windows --class os {
+	insmod part_msdos
 	set root=$GRUB_DRIVE
 	chainloader +1
 }
-
 EOF
 done
+}
+check_OSWINDOWS
 
 if [ -e "/boot/grub/grub.cfg" ]; then
 	continue
