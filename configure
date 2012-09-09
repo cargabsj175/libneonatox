@@ -34,26 +34,46 @@ CONFMODE=644
 
 cat << EOT > Makefile
 create-dirs:
-	install -d -m ${DIRMODE} ${INSTALL_DIR}/share/doc/$PACKAGE_NAME
+	install -d -m ${DIRMODE} ${INSTALL_DIR}/share/doc/${PACKAGE_NAME}
 	install -d -m ${DIRMODE} ${INSTALL_DIR}/share/pixmaps
 	install -d -m ${DIRMODE} ${INSTALL_DIR}/share/applications
 	install -d -m ${DIRMODE} ${INSTALL_DIR}/bin
-	install -d -m ${DIRMODE} ${LIBDIR}/$PACKAGE_NAME
-	install -d -m ${DIRMODE} ${INSTALL_DIR}/share/$PACKAGE_NAME
+	install -d -m ${DIRMODE} ${LIBDIR}/${PACKAGE_NAME}
+	install -d -m ${DIRMODE} ${INSTALL_DIR}/share/${PACKAGE_NAME}
 	
 all : create-dirs
-	install -m ${MODE} scripts/*	${INSTALL_DIR}/bin
-	install -m ${MODE} lib/*	${LIBDIR}/$PACKAGE_NAME
+	install -m ${MODE} scripts/*	${LIBDIR}/${PACKAGE_NAME}
+	install -m ${MODE} lib/*	${LIBDIR}/${PACKAGE_NAME}
 	install -m ${MODE} icons/*	${INSTALL_DIR}/share/pixmaps
-	install -m ${MODE} AUTHORS	${INSTALL_DIR}/share/doc/$PACKAGE_NAME
-	install -m ${MODE} COPYING	${INSTALL_DIR}/share/doc/$PACKAGE_NAME
-	install -m ${MODE} NEWS	${INSTALL_DIR}/share/doc/$PACKAGE_NAME
-	install -m ${MODE} THANKS	${INSTALL_DIR}/share/doc/$PACKAGE_NAME
-		
-install : all
+	install -m ${MODE} AUTHORS	${INSTALL_DIR}/share/doc/${PACKAGE_NAME}
+	install -m ${MODE} COPYING	${INSTALL_DIR}/share/doc/${PACKAGE_NAME}
+	install -m ${MODE} NEWS	${INSTALL_DIR}/share/doc/${PACKAGE_NAME}
+	install -m ${MODE} THANKS	${INSTALL_DIR}/share/doc/${PACKAGE_NAME}
+	ln -sf ${LIBDIR}/${PACKAGE_NAME}/addnewuser	${INSTALL_DIR}/bin/addnewuser
+	ln -sf ${LIBDIR}/${PACKAGE_NAME}/changepassroot	${INSTALL_DIR}/bin/changepassroot
+	ln -sf ${LIBDIR}/${PACKAGE_NAME}/findpart	${INSTALL_DIR}/bin/findpart
+	ln -sf ${LIBDIR}/${PACKAGE_NAME}/infouser	${INSTALL_DIR}/bin/infouser
+	ln -sf ${LIBDIR}/${PACKAGE_NAME}/neoupdate	${INSTALL_DIR}/bin/neoupdate
+	ln -sf ${LIBDIR}/${PACKAGE_NAME}/updategrub2	${INSTALL_DIR}/bin/update-grub
+	ln -sf ${LIBDIR}/${PACKAGE_NAME}/updategrub2	${INSTALL_DIR}/bin/update-grub2
+	ln -sf ${LIBDIR}/${PACKAGE_NAME}/updategrub2	${INSTALL_DIR}/bin/updategrub2
 
+
+install : all 
+
+uninstall :
+	rm -rf ${LIBDIR}/${PACKAGE_NAME}
+	rm -rf ${INSTALL_DIR}/share/doc/${PACKAGE_NAME}
+	rm -rf ${INSTALL_DIR}/share/pixmaps/neoupdate.png
+	rm -rf ${INSTALL_DIR}/bin/addnewuser
+	rm -rf ${INSTALL_DIR}/bin/changepassroot
+	rm -rf ${INSTALL_DIR}/bin/findpart
+	rm -rf ${INSTALL_DIR}/bin/infouser
+	rm -rf ${INSTALL_DIR}/bin/neoupdate
+	rm -rf ${INSTALL_DIR}/bin/update{-grub{,2},grub2}
+	
 .PHONY:
-	create-dirs all install
+	create-dirs all install uninstall
 
 EOT
 
@@ -61,5 +81,5 @@ echo "Makefile generado correctamente, Para instalar escriba 'make install'"
 
 #install -m ${MODE} data/*.desktop	${INSTALL_DIR}/share/applications
 #install -m ${MODE} data/*.png	${INSTALL_DIR}/share/pixmaps
-#install -m ${MODE} doc/*	${INSTALL_DIR}/share/doc/$PACKAGE_NAME
+#install -m ${MODE} doc/*	${INSTALL_DIR}/share/doc/${PACKAGE_NAME}
 
