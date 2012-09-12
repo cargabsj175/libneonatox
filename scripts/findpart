@@ -232,7 +232,7 @@ do
     DISCO=hd$i
     nuevohd=$(grep "${DISCO}" "/proc/partitions")
     if [ -n "$nuevohd" ]; then
-        for n in 1 2 3 4 5 6 7
+        for n in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 		do
 		part=hd$i$n
 		nuevohd=$(grep "${part}" "/proc/partitions")
@@ -265,7 +265,7 @@ do
     DISCO=sd$i
     nuevohd=$(grep "${DISCO}" "/proc/partitions")
     if [ -n "$nuevohd" ]; then
-        for n in 1 2 3 4 5 6 7
+        for n in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 		do
 		part=sd$i$n
 		nuevohd=$(grep "${part}" "/proc/partitions")
