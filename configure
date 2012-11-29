@@ -28,8 +28,8 @@ echo $default_libdir
 DESTDIR=$default_prefix
 LIBDIR=$default_libdir
 SHELL=/bin/bash
-MODE=754
-DIRMODE=755
+MODE=755
+DIRMODE=754
 CONFMODE=644
 
 cat << EOT > Makefile
@@ -44,7 +44,9 @@ create-dirs:
 all : create-dirs
 	install -m ${MODE} scripts/*	${LIBDIR}/${PACKAGE_NAME}
 	install -m ${MODE} lib/*	${LIBDIR}/${PACKAGE_NAME}
-	install -m ${MODE} icons/*	${DESTDIR}/share/pixmaps
+	install -m ${MODE} data/*.png	${DESTDIR}/share/pixmaps
+	install -m ${MODE} data/*.desktop ${DESTDIR}/share/applications
+	install -m ${MODE} man/* ${DESTDIR}/share/man/man8
 	install -m ${MODE} AUTHORS	${DESTDIR}/share/doc/${PACKAGE_NAME}
 	install -m ${MODE} COPYING	${DESTDIR}/share/doc/${PACKAGE_NAME}
 	install -m ${MODE} NEWS	${DESTDIR}/share/doc/${PACKAGE_NAME}
@@ -57,21 +59,35 @@ all : create-dirs
 	ln -sf ${LIBDIR}/${PACKAGE_NAME}/updategrub2	${DESTDIR}/bin/update-grub
 	ln -sf ${LIBDIR}/${PACKAGE_NAME}/updategrub2	${DESTDIR}/bin/update-grub2
 	ln -sf ${LIBDIR}/${PACKAGE_NAME}/updategrub2	${DESTDIR}/bin/updategrub2
-
-
+	ln -sf ${LIBDIR}/${PACKAGE_NAME}/split4nho	${DESTDIR}/bin/split4nho
+	ln -sf ${LIBDIR}/${PACKAGE_NAME}/repo2html	${DESTDIR}/bin/repo2html
+	ln -sf updategrub2.8 ${DESTDIR}/share/man/man8/update-grub2.8
+	ln -sf updategrub2.8 ${DESTDIR}/share/man/man8/update-grub.8
+	
 install : all 
 
 uninstall :
 	rm -rf ${LIBDIR}/${PACKAGE_NAME}
 	rm -rf ${DESTDIR}/share/doc/${PACKAGE_NAME}
 	rm -rf ${DESTDIR}/share/pixmaps/neoupdate.png
+	rm -rf ${DESTDIR}/share/applications/neoupdate.desktop
 	rm -rf ${DESTDIR}/bin/addnewuser
 	rm -rf ${DESTDIR}/bin/changepassroot
 	rm -rf ${DESTDIR}/bin/findpart
 	rm -rf ${DESTDIR}/bin/infouser
 	rm -rf ${DESTDIR}/bin/neoupdate
 	rm -rf ${DESTDIR}/bin/update{-grub{,2},grub2}
-	
+	rm -rf ${DESTDIR}/bin/split4nho
+	rm -rf ${DESTDIR}/bin/repo2html
+	rm -rf ${DESTDIR}/share/man/man8/addnewuser.8
+	rm -rf ${DESTDIR}/share/man/man8/changepassroot.8
+	rm -rf ${DESTDIR}/share/man/man8/findpart.8
+	rm -rf ${DESTDIR}/share/man/man8/infouser.8
+	rm -rf ${DESTDIR}/share/man/man8/libneonatox.8
+	rm -rf ${DESTDIR}/share/man/man8/neoupdate.8
+	rm -rf ${DESTDIR}/share/man/man8/update{-grub{,2},grub2}.8
+	rm -rf ${DESTDIR}/share/man/man8/split4nho.8
+	rm -rf ${DESTDIR}/share/man/man8/repo2html.8
 .PHONY:
 	create-dirs all install uninstall
 

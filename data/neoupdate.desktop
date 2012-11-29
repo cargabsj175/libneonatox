@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=0.6.1
+Encoding=UTF-8
+Type=Application
+Name=Neoupdate (Modo Gráfico)
+Name[en]=Neoupdate (GUI)
+Comment=Actualiza NeonatoX
+Comment[en]=Update NeonatoX
+Categories=Application;System;
+Exec=gksu /usr/bin/neoupdate -g
+Icon=neoupdate
+Terminal=false
+StartupNotify=true
+GenericName=Actualizador
+GenericName[en]=Update

@@ -1,0 +1,220 @@
+#! /bin/sh
+#=========================================================#
+# /usr/bin/split4nho
+# Libreria para Vegnux NeonatoX OS
+# Genera "rebanadas" de un paquete de código fuente entendibles por nhopkg.
+# Además de hacer la tarea más facil para el empaquetador :)
+# Proyecto Venezolano VegnuX <http://www.vegnux.org.ve>
+# Por:
+# Carlos Sánchez <mkl.vegnux@gmail.com>
+# Nehemias Velasquez <nehe009@gmail.com>
+# 2007 - 2012
+# GPLv3
+# This program comes with ABSOLUTELY NO WARRANTY.
+#=========================================================#
+#===============Inicio de Programa=================#
+
+#variables
+tmpdir=/tmp
+workdir=$tmpdir/workdir.$(date +%H%M%S)
+curdir=$(pwd)
+# set the lsb_release file for detect neonatox version
+. /etc/lsb-release
+# testing neonatox version
+pkgrel=n${DISTRIB_RELEASE}
+
+function help(){
+    echo "split4nho - Proyecto VegnuX 2007-2012 (GPLv3)"
+	echo ""
+	echo "Uso: split4nho [OPTION]"
+	echo ""
+	echo "-h, --help: Muestra esta información."
+	echo "-t, --tarball-source: Crea solo un pseudo tarball de código fuente."
+	echo "		Opcionalmente crea un nhoid compatible con nhopkg."
+}
+
+function wizzard(){
+# Asistente
+echo "¿Su nombre completo o nick? (Ej.: $(whoami))"
+read -er pkgusername
+while [ -z ${pkgusername} ]; do
+echo "¡Debe Introducir algún nombre!"
+echo "¿Su nombre completo o nick? (Ej.: $(whoami))"
+read -er pkgusername
+done
+echo "¿Su correo electrónico? (Ej.: $(whoami)@$HOSTNAME.com)"
+read -er email
+while [ -z ${email} ]; do
+echo "¡Debe Introducir algún correo electrónico!"
+echo "¿Su correo electrónico? (Ej.: $(whoami)@$HOSTNAME.com)"
+read -er email
+done
+echo "¿Licencia para los paquetes? Usualmente la misma del paquete padre (Ej. GPLv3)"
+read -er licencepkg
+while [ -z ${licencepkg} ]; do
+echo "¡Debe Introducir alguna licencia!"
+echo "¿Licencia para los paquetes? Usualmente la misma del paquete padre (Ej. GPLv3)"
+read -er licencepkg
+done
+echo "¿Nombre del paquete principal? (Ej.: gcc):"
+read -er pkgbase
+while [ -z ${pkgbase} ]; do
+echo "¡Debe Introducir un nombre!"
+echo "¿Nombre del paquete principal? (Ej.: gcc):"
+read -er pkgbase
+done
+echo "¿Versión del paquete ${pkgbase}-${splitlist}? (Ej.: 4.5.1):"
+read -er pkgver
+while [ -z ${pkgver} ]; do
+echo "¡Debe Introducir algún valor!"
+echo "¿Versión del paquete ${pkgbase}-${splitlist}? (Ej.: 4.5.1):"
+read -er pkgver
+done
+echo "¿Nombre de las rebanadas? Separado con espacios  (Ej.: fortran libs objc):"
+read -er pkgsplit
+while [ -z ${pkgsplit} ]; do
+echo "¡Debe Introducir al menos un nombre!"
+echo "¿Nombre de las rebanadas? Separado con espacios  (Ej.: fortran libs objc):"
+read -er pkgsplit
+done
+echo "¿URL del paquete ${pkgbase}-${splitlist}? Usualmente la misma del paquete padre (Ej.: http://gcc.gnu.org)"
+read -er urlkpkg
+while [ -z ${urlkpkg} ]; do
+echo "¡Debe Introducir alguna URL!"
+echo "¿URL del paquete ${pkgbase}-${splitlist}? Usualmente la misma del paquete padre (Ej.: http://gcc.gnu.org)"
+read -er urlkpkg
+done
+# Creando el directorio de trabajo
+mkdir ${workdir}
+}
+# Crear las rebanadas
+function mksplit(){
+for splitlist in ${pkgsplit};do
+if [[ ${DISTRIB_RELEASE} == 06.1 ||  ${DISTRIB_RELEASE} == 0.5.1 ]]; then
+echo "** Generando ${pkgbase}-${splitlist}-${pkgver}-$pkgrel.tar.bz2 ..."
+elif [ ${DISTRIB_RELEASE} == 07.1 || ${DISTRIB_RELEASE} == 07.2 ]; then
+echo "** Generando ${pkgbase}-${splitlist}-${pkgver}-$pkgrel.ta.xz ..."
+fi
+mkdir -p ${workdir}/${pkgbase}-${splitlist}-${pkgver}
+# Generando los build.split
+cat << EOT >> ${workdir}/${pkgbase}-${splitlist}-${pkgver}/build.split
+#!/bin/bash
+buildir=\$(pwd)
+basesrc="/usr/src/nhopkg/${pkgbase}-${pkgver}"
+if [ -d \$basesrc ]; then
+cd \$basesrc
+listsrc=\$(ls)
+cd \$buildir
+for linking in \$listsrc; do
+ln -sf \$basesrc/\$linking ./\$linking
+done
+else
+echo "***************************************************************************"
+echo "Es necesario el directorio de código fuente en: \$basesrc para construir este paquete"
+echo "***************************************************************************"
+exit 0
+fi
+EOT
+chmod 0755 ${workdir}/${pkgbase}-${splitlist}-${pkgver}/build.split
+# Generando tarball tomando en cuenta la version de neonatox
+cd ${workdir}
+if [[ ${DISTRIB_RELEASE} == 06.1 ||  ${DISTRIB_RELEASE} == 0.5.1 ]]; then
+tar cjf ${pkgbase}-${splitlist}-${pkgver}.tar.bz2 ${pkgbase}-${splitlist}-${pkgver}
+rm -rf ${pkgbase}-${splitlist}-${pkgver}
+cp ${pkgbase}-${splitlist}-${pkgver}.tar.* ${curdir}
+cd ${curdir}
+elif [ ${DISTRIB_RELEASE} == 07.1 || ${DISTRIB_RELEASE} == 07.2 ]; then
+tar cJf ${pkgbase}-${splitlist}-${pkgver}.tar.xz ${pkgbase}-${splitlist}-${pkgver}
+rm -rf ${pkgbase}-${splitlist}-${pkgver}
+cp ${pkgbase}-${splitlist}-${pkgver}.tar.* ${curdir}
+cd ${curdir}
+fi
+echo "¿Desea crear un fichero nhoid para ${pkgbase}-${splitlist}-${pkgver}? (y/n)"
+read -er answer
+case $answer in
+"y")
+# preparando las cosas para el fichero nhoid
+echo "¿Grupo del paquete ${pkgbase}-${splitlist}? (Ej.: Programming)"
+read -er grouppkg
+while [ -z ${grouppkg} ]; do
+echo "¡Debe Introducir algún grupo!"
+echo "¿Grupo del paquete ${pkgbase}-${splitlist}? (Ej.: Programming)"
+read -er grouppkg
+done
+echo "¿Descripción del paquete ${pkgbase}-${splitlist}? (Ej.: the gnu compiler collection)"
+read -er descpkg
+while [ -z ${descpkg} ]; do
+echo "¡Debe Introducir alguna descripción!"
+echo "¿Descripción del paquete ${pkgbase}-${splitlist}? (Ej.: the gnu compiler collection)"
+read -er descpkg
+done
+echo "¿Dependencia de compilación para ${pkgbase}-${splitlist}-${pkgver}? Introduzca solo una.)"
+read -er nhopkgdepbuild
+while [ -z ${nhopkgdepbuild} ]; do
+echo "¡Debe Introducir alguna dependencia!"
+echo "¿Dependencia de compilación para ${pkgbase}-${splitlist}-${pkgver}? Introduzca solo una.)"
+read -er nhopkgdepbuild
+done
+echo "¿Dependencia post compilación para ${pkgbase}-${splitlist}-${pkgver}? Introduzca solo una.)"
+read -er nhopkgdeppostbuild
+while [ -z ${nhopkgdeppostbuild} ]; do
+echo "¡Debe Introducir alguna dependencia!"
+echo "¿Dependencia post compilación para ${pkgbase}-${splitlist}-${pkgver}? Introduzca solo una.)"
+read -er nhopkgdeppostbuild
+done
+# generando el nhoid
+cat << EOT >> ${curdir}/nhoid.${pkgbase}-${splitlist}.${pkgver}
+#%NHO-0.5
+# Package Maintainer:	${pkgusername} <${email}>
+
+# Name:	${pkgbase}-${splitlist}
+# Version:	${pkgver}
+# Release:	${pkgrel}
+# License:	${licencepkg}
+# Group:	${grouppkg}
+# Arch:	i486 i586 i686 x86_64 mips mips64 mipsel mips64el ppc ppc64 arm arm64 armel
+# Url:	${urlkpkg}
+# Description:	${descpkg}
+# MD5:	${pkgmd5}
+
+# BuildDep:	${nhopkgdepbuild}	${nhopkgdepbuild}
+# Dep(post):	${nhopkgdeppostbuild}	${nhopkgdeppostbuild}
+
+nbuild() {
+./build.split
+}
+
+ninstall() {
+noemptyfuncs
+}
+
+npostinstall() {
+noemptyfuncs
+}
+
+npostremove() {
+noemptyfuncs
+}
+EOT
+;;
+"n")
+echo ""
+;;
+esac
+done
+}
+
+if [[ "$1" = "-h" || "$1" = "--help" ]]; then
+help
+exit 0
+elif [[ "$1" = "-t" || "$1" = "--tarball-source" ]]; then
+wizzard
+mksplit
+# cleaning up
+rm -rf ${workdir}
+exit 0
+fi
+
+echo ""
+echo "Use \"--help\" para más detalles."
+#===============Fin de Programa=================#

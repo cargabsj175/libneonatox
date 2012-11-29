@@ -1,0 +1,114 @@
+#! /bin/sh
+#=========================================================#
+# /usr/bin/repo2html
+# Libreria para Vegnux NeonatoX OS
+# Genera un listado de enlaces en HTML de los paquetes binarios y fuente en http://vegnux.org.ve/repo
+# Proyecto Venezolano VegnuX <http://www.vegnux.org.ve>
+# Por:
+# Carlos Sánchez <mkl.vegnux@gmail.com>
+# Nehemias Velasquez <nehe009@gmail.com>
+# 2007 - 2012
+# GPLv3
+# This program comes with ABSOLUTELY NO WARRANTY.
+#=========================================================#
+#===============Inicio de Programa=================#
+#variables
+# set the lsb_release file for detect neonatox version
+. /etc/lsb-release
+# testing neonatox version
+if [ ${DISTRIB_RELEASE} = 06.1 ]; then
+export nserie=n06
+elif [ ${DISTRIB_RELEASE} = 0.5.1 ]; then
+export nserie=n05
+elif [ ${DISTRIB_RELEASE} = 07.1 ]; then
+export nserie=n07
+fi
+# setting architecture
+export ARCH=$(uname -m)
+# setting exe directory
+curdir=$(pwd)
+# setting revision file
+export rev=$(date +20%y%m%d_%H.%M.%S)
+function main(){
+urlsrc="http://vegnux.org.ve/repo/${nserie}/sources"
+urlbin="http://vegnux.org.ve/repo/${nserie}/stable/${ARCH}"
+# obtiene un listado de paquetes *.nho
+echo "¿Directorio de los paquetes binarios? (Ej. /home/neonatox/binarios)"
+read -e packagedir
+while [ -z "${packagedir}" ]; do
+echo "¡Debe introducir algún directorio!"
+echo "¿Directorio de los paquetes binarios? (Ej. /home/neonatox/binarios)"
+read -e packagedir
+done
+# setting html output directory (default $HOME)
+export outputdir=${HOME}
+cd ${packagedir}
+export pkglist=$(ls *.nho 2>/dev/null)
+cd ${curdir}
+echo "Procesando paquetes en ${packagedir} ..."
+for lister in ${pkglist}
+do
+export lister_src=$(echo $lister | sed 's/.nho/.src.nho/g')
+export lister_simple=$(echo $lister | sed 's/.nho//g')
+echo "** $lister_simple | <a href=\"$urlbin/$lister\">binario</a> | <a href=\"$urlsrc/$lister_src\">fuente</a> |<br>" >> ${outputfilename}
+unset outputdir
+done
+echo ""
+echo "listado generado en ${outputfilename}."
+}
+
+function help(){
+    echo "repo2html 0.1 - Proyecto VegnuX 2007-2012 (GPLv3)"
+	echo ""
+	echo "Uso: repo2html [OPTION] ..."
+	echo ""
+	echo "-h, --help: Muestra esta información."
+	echo "-c, --only-code: Solo el codigo html sin cabecera"
+	echo "-f, --full-html: Documento html completo, visible desde un navegador."
+}
+
+
+if [[ "$1" = "-h" || "$1" = "--help" ]]; then
+help
+exit 0
+elif [[ "$1" = "--only-code" || "$1" = "-c" ]]; then
+if [[ ${outputdir} == " " ]]; then
+export outputfilename="${outputdir}/list-${nserie}.1-${ARCH}-${rev}"
+echo "Paquetes nuevos y/o actualizados."  >> ${outputfilename}
+echo ""  >> ${outputfilename}
+main
+unset outputfilename
+exit 0
+elif [[ "$1" = "--full-html" || "$1" = "-f" ]]; then
+export outputfilename="${outputdir}/list-${nserie}.1-${ARCH}-${rev}.html"
+cat << EOT >> ${outputfilename}
+<!--
+	list-${nserie}.1-${ARCH}-${rev}.html
+	Copyright 2012 $(whoami) <$(whoami)@$HOSTNAME>
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>main - list-${nserie}.1-${ARCH}-${rev}</title>
+	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+	<meta name="generator" content="main 0.1" />
+</head>
+<body>
+Paquetes nuevos y/o actualizados:
+<br><br>
+EOT
+main
+cat << EOT >> ${outputfilename}
+<hr>
+Fichero Generado por repo2html 0.1 - Proyecto Vegnux 2007-20$(date +%y).
+</body>
+</html>
+EOT
+unset outputfilename
+exit 0
+fi
+
+echo ""
+echo "Use \"--help\" para más detalles."
+#===============Fin de Programa=================#
