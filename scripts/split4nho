@@ -37,7 +37,7 @@ function wizzard(){
 # Asistente
 echo "¿Su nombre completo o nick? (Ej.: $(whoami))"
 read -er pkgusername
-while [[[ -z ${pkgusername} ]]; do
+while [[ -z ${pkgusername} ]]; do
 echo "¡Debe Introducir algún nombre!"
 echo "¿Su nombre completo o nick? (Ej.: $(whoami))"
 read -er pkgusername
