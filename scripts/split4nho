@@ -37,49 +37,49 @@ function wizzard(){
 # Asistente
 echo "¿Su nombre completo o nick? (Ej.: $(whoami))"
 read -er pkgusername
-while [ -z ${pkgusername} ]; do
+while [[[ -z ${pkgusername} ]]; do
 echo "¡Debe Introducir algún nombre!"
 echo "¿Su nombre completo o nick? (Ej.: $(whoami))"
 read -er pkgusername
 done
 echo "¿Su correo electrónico? (Ej.: $(whoami)@$HOSTNAME.com)"
 read -er email
-while [ -z ${email} ]; do
+while [[ -z ${email} ]]; do
 echo "¡Debe Introducir algún correo electrónico!"
 echo "¿Su correo electrónico? (Ej.: $(whoami)@$HOSTNAME.com)"
 read -er email
 done
 echo "¿Licencia para los paquetes? Usualmente la misma del paquete padre (Ej. GPLv3)"
 read -er licencepkg
-while [ -z ${licencepkg} ]; do
+while [[ -z ${licencepkg} ]]; do
 echo "¡Debe Introducir alguna licencia!"
 echo "¿Licencia para los paquetes? Usualmente la misma del paquete padre (Ej. GPLv3)"
 read -er licencepkg
 done
 echo "¿Nombre del paquete principal? (Ej.: gcc):"
 read -er pkgbase
-while [ -z ${pkgbase} ]; do
+while [[ -z ${pkgbase} ]]; do
 echo "¡Debe Introducir un nombre!"
 echo "¿Nombre del paquete principal? (Ej.: gcc):"
 read -er pkgbase
 done
 echo "¿Versión del paquete ${pkgbase}-${splitlist}? (Ej.: 4.5.1):"
 read -er pkgver
-while [ -z ${pkgver} ]; do
+while [[ -z ${pkgver} ]]; do
 echo "¡Debe Introducir algún valor!"
 echo "¿Versión del paquete ${pkgbase}-${splitlist}? (Ej.: 4.5.1):"
 read -er pkgver
 done
 echo "¿Nombre de las rebanadas? Separado con espacios  (Ej.: fortran libs objc):"
 read -er pkgsplit
-while [ -z ${pkgsplit} ]; do
+while [[ -z ${pkgsplit} ]]; do
 echo "¡Debe Introducir al menos un nombre!"
 echo "¿Nombre de las rebanadas? Separado con espacios  (Ej.: fortran libs objc):"
 read -er pkgsplit
 done
 echo "¿URL del paquete ${pkgbase}-${splitlist}? Usualmente la misma del paquete padre (Ej.: http://gcc.gnu.org)"
 read -er urlkpkg
-while [ -z ${urlkpkg} ]; do
+while [[ -z ${urlkpkg} ]]; do
 echo "¡Debe Introducir alguna URL!"
 echo "¿URL del paquete ${pkgbase}-${splitlist}? Usualmente la misma del paquete padre (Ej.: http://gcc.gnu.org)"
 read -er urlkpkg
@@ -136,28 +136,28 @@ case $answer in
 # preparando las cosas para el fichero nhoid
 echo "¿Grupo del paquete ${pkgbase}-${splitlist}? (Ej.: Programming)"
 read -er grouppkg
-while [ -z ${grouppkg} ]; do
+while [[ -z ${grouppkg} ]]; do
 echo "¡Debe Introducir algún grupo!"
 echo "¿Grupo del paquete ${pkgbase}-${splitlist}? (Ej.: Programming)"
 read -er grouppkg
 done
 echo "¿Descripción del paquete ${pkgbase}-${splitlist}? (Ej.: the gnu compiler collection)"
 read -er descpkg
-while [ -z ${descpkg} ]; do
+while [[ -z ${descpkg} ]]; do
 echo "¡Debe Introducir alguna descripción!"
 echo "¿Descripción del paquete ${pkgbase}-${splitlist}? (Ej.: the gnu compiler collection)"
 read -er descpkg
 done
 echo "¿Dependencia de compilación para ${pkgbase}-${splitlist}-${pkgver}? Introduzca solo una.)"
 read -er nhopkgdepbuild
-while [ -z ${nhopkgdepbuild} ]; do
+while [[ -z ${nhopkgdepbuild} ]]; do
 echo "¡Debe Introducir alguna dependencia!"
 echo "¿Dependencia de compilación para ${pkgbase}-${splitlist}-${pkgver}? Introduzca solo una.)"
 read -er nhopkgdepbuild
 done
 echo "¿Dependencia post compilación para ${pkgbase}-${splitlist}-${pkgver}? Introduzca solo una.)"
 read -er nhopkgdeppostbuild
-while [ -z ${nhopkgdeppostbuild} ]; do
+while [[ -z ${nhopkgdeppostbuild} ]]; do
 echo "¡Debe Introducir alguna dependencia!"
 echo "¿Dependencia post compilación para ${pkgbase}-${splitlist}-${pkgver}? Introduzca solo una.)"
 read -er nhopkgdeppostbuild
