@@ -210,6 +210,43 @@ done
 unset if_initrd
 }
 
+# android X86 EXPERIMENTAL!!
+function check_OSANDROID (){
+devls=$(ls -1 /dev/disk/by-uuid/* 2> /dev/null | sed 's@/dev/disk/by-uuid/@@g')
+for mounttmp in $devls;do
+$(udisks --mount  /dev/disk/by-uuid/$mountmp) 2>/dev/null
+done
+for dir in /media/*?*/android-*;do
+	# chequeando que exista el kernel
+	if [[ -f ${dir}/kernel ]]; then
+		ANDRO_OS=$(basename ${dir})
+	else
+	continue
+	fi
+export GRUB_DRIVE="`${grub_probe} --target=drive "${dir}" 2>/dev/null`"
+export GRUB_DEVICE="`${grub_probe} --target=device "${dir}" 2>/dev/null`"
+export GRUB_FSUUID="`${grub_probe} --target=fs_uuid "${dir}" 2>/dev/null`"
+export GRUB_FS="`${grub_probe} --target=fs "${dir}" 2>/dev/null`"
+export GRUB_PARTMAP="`${grub_probe} --target=partmap "${dir}" 2>/dev/null`"
+if [[ ${DISTRIB_DESCRIPTION} = "" ]] | [[ ${GRUB_DEVICE} = "" ]]; then
+  echo ""
+  else
+echo "** "${ANDRO_OS}" en:  "${GRUB_DEVICE}"" >&2
+fi
+cat << EOF >> /boot/grub/grub.cfg 
+menuentry $ANDRO_OS --class gnu-linux --class gnu --class os {
+	insmod ${GRUB_PARTMAP}
+	insmod ${GRUB_FS}
+	set root=${GRUB_DRIVE}
+	search --no-floppy --fs-uuid --set ${GRUB_FSUUID}
+	linux /$ANDRO_OS/kernel quiet root=/dev/ram0 androidboot.hardware=android_x86 acpi_sleep=s3_bios,s3_mode SRC=/$ANDRO_OS
+	initrd /$ANDRO_OS/initrd.img
+}
+EOF
+done
+}
+
+
 #chequear otros sistemas no linux.
 function check_OSWINDOWS(){
 devls=$(ls -1 /dev/disk/by-uuid/* 2> /dev/null | sed 's@/dev/disk/by-uuid/@@g')
@@ -277,6 +314,18 @@ cat << EOF >> /boot/grub/grub.cfg
 # BEGIN WINDOWS
 
 EOF
+cat << EOF >> /boot/grub/grub.cfg
+#######################################
+# BEGIN ANDROID x86
+
+EOF
+check_OSANDROID
+cat << EOF >> /boot/grub/grub.cfg
+
+# END ANDROID x86
+#######################################
+EOF
+
 check_OSWINDOWS
 cat << EOF >> /boot/grub/grub.cfg
 
