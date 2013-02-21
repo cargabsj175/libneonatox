@@ -92,7 +92,7 @@ function mksplit(){
 for splitlist in ${pkgsplit};do
 if [[ ${DISTRIB_RELEASE} == 06.1 ||  ${DISTRIB_RELEASE} == 0.5.1 ]]; then
 echo "** Generando ${pkgbase}-${splitlist}-${pkgver}-$pkgrel.tar.bz2 ..."
-elif [ ${DISTRIB_RELEASE} == 07.1 || ${DISTRIB_RELEASE} == 07.2 ]; then
+elif [[ ${DISTRIB_RELEASE} == 07.1 || ${DISTRIB_RELEASE} == 07.2 ]]; then
 echo "** Generando ${pkgbase}-${splitlist}-${pkgver}-$pkgrel.ta.xz ..."
 fi
 mkdir -p ${workdir}/${pkgbase}-${splitlist}-${pkgver}
@@ -124,7 +124,7 @@ rm -rf ${pkgbase}-${splitlist}-${pkgver}
 export pkgmd5=$(md5sum ${pkgbase}-${splitlist}-${pkgver}.tar.bz2)
 cp ${pkgbase}-${splitlist}-${pkgver}.tar.* ${curdir}
 cd ${curdir}
-elif [ ${DISTRIB_RELEASE} == 07.1 || ${DISTRIB_RELEASE} == 07.2 ]; then
+elif [[ ${DISTRIB_RELEASE} == 07.1 || ${DISTRIB_RELEASE} == 07.2 ]]; then
 tar cJf ${pkgbase}-${splitlist}-${pkgver}.tar.xz ${pkgbase}-${splitlist}-${pkgver}
 rm -rf ${pkgbase}-${splitlist}-${pkgver}
 export pkgmd5=$(md5sum ${pkgbase}-${splitlist}-${pkgver}.tar.xz)
