@@ -195,7 +195,7 @@ done
 function check_OTHERLINUX()
 {
 for dir in /mnt/*?* ; do
-list=`for i in $dir/boot/vmlinu[xz]-* /vmlinu[xz]-* ; do
+list=`for i in ${dir}/boot/vmlinu[xz]-* ${dir}/vmlinu[xz]-* ; do
         if grub_file_is_not_garbage "$i" ; then echo -n "$i " ; fi
       done`
 #Chequear por linux.
@@ -248,10 +248,10 @@ function check_WINDOWS()
 for dir in /mnt/*?* ; do
   # Chequea para Vista/Seven bootmgr.
   if [[ -f ${dir}/bootmgr ]] ; then
-    OS_F="Microsoft Windows Vista/7/8"
+    OS_F="Microsoft Windows Vista+"
   # Chequea para NT/2000/XP NTLDR.
   elif [[ -f ${dir}/ntldr ]] ; then
-    OS_F="Microsoft Windows NT/2000/XP"
+    OS_F="Microsoft Windows NT+"
 else
     continue
   fi
@@ -351,7 +351,6 @@ echo "$red Pude que no tenga GRUB2 instalado en esta particion. $normal"
 fi
 
 ok_fail "Error creando /boot/grub/grub.cfg"
-echo "¡Hecho!"
 echo ""
 echo "Archivo de configuracion de GRUB2 creado en /boot/grub/grub.cfg"
 unmntpnt 2> /dev/null
