@@ -102,7 +102,7 @@ done
 }
 # fin de mntpnt
 
-# 2. función check_DEVICEMAP
+# 3. función check_DEVICEMAP
 ##############################
 # Descripción: verifica que exista el fichero 
 # /boot/grub/device.map
@@ -117,7 +117,50 @@ grub-mkdevicemap --no-floppy --device-map=/boot/grub/device.map
 fi
 }
 
-# fin de check_DEVICEMAP
+# fin de check_OSkernel
+
+# 4. función check_ramdisk
+##############################
+# Descripción: intenta "detectar" los respectivos
+# ramdisks de cada kernel
+##############################
+	
+function check_OSkernel()
+{
+if [[ -f ${dir}/etc/lsb-release ]];then
+. ${dir}/etc/lsb-release
+fi
+linux=`version_find_latest $list`
+if [[ ${DISTRIB_DESCRIPTION} = "" ]] | [[ ${GRUB_DEVICE} = "" ]]; then
+echo ""
+else
+echo "** "${DISTRIB_DESCRIPTION}" @ "${GRUB_DEVICE}"" >&2
+fi
+basename=`basename $linux`
+dirname=`dirname $linux`
+rel_dirname=`make_system_path_relative_to_its_root ${dir}`
+version=`echo $basename | sed -e "s,^[^0-9]*-,,g"`
+alt_version=`echo $version | sed -e "s,\.old$,,g"`
+}
+
+# 5. función check_ramdisk
+##############################
+# Descripción: intenta "detectar" los respectivos
+# ramdisks de cada kernel
+##############################
+function check_ramdisk()
+{
+if [ -e ${dir}/boot/initrd.img-${version} ];then
+export if_initrd="initrd /boot/initrd.img-${version}"
+elif [ -e ${dir}/boot/initrd-${version}.img ];then
+export if_initrd="initrd /boot/initrd-${version}.img"
+elif [ -e ${dir}/boot/initrd-${version} ];then
+export if_initrd="initrd /boot/initrd-${version}"
+else
+export if_initrd=""
+fi
+}
+# fin de ckeck_ramdisk
 
 # funciones específicas
 # 1. función check_NEONATOX
@@ -130,42 +173,17 @@ list=`for i in /boot/vmlinu[xz]-* /vmlinu[xz]-* ; do
         if grub_file_is_not_garbage "$i" ; then echo -n "$i " ; fi
       done`
 while [ "x$list" != "x" ] ; do
-  linux=`version_find_latest $list`
-  if [[ ${DISTRIB_DESCRIPTION} = "" ]] | [[ ${GRUB_DEVICE} = "" ]]; then
-  echo ""
-  else
-  echo "** "${DISTRIB_DESCRIPTION}" @ "${GRUB_DEVICE}"" >&2
-  fi
-  basename=`basename $linux`
-  dirname=`dirname $linux`
-  rel_dirname=`make_system_path_relative_to_its_root ${dir}`
-  version=`echo $basename | sed -e "s,^[^0-9]*-,,g"`
-  alt_version=`echo $version | sed -e "s,\.old$,,g"`
-  for a in "initrd.img-${version}" "initrd-${version}.img" \
-   "initrd-${version}" "initrd.img-${alt_version}" \
-   "initrd-${alt_version}.img" "initrd-${alt_version}"; do
-  if test -e "/boot/${a}" ; then
-      initrd="$a"
-      break
-    fi
-  done
-  if test -n "${initrd}" ; then
-    # echo "Encontrada imagen initrd @ ${dir}/${initrd}" >&2
-    if_initrd="initrd /boot/${initrd}"
-  else
-echo ""
-  fi
-grub_common_vars
-if [[ -f ${dir}/etc/lsb-release ]];then
-. $dir/etc/lsb-release
 
+check_OSkernel
+check_ramdisk
+
+grub_common_vars
 	if [[ "${if_initrd}" == "" ]];then
 		single_neonatox_entry # si no existe el initrd
 	else
 		neonatox_entry # si existe el initrd
 	fi
-	
-fi
+
 list=`echo $list | tr ' ' '\n' | grep -vx $linux | tr '\n' ' '`
 done
 }
@@ -182,39 +200,17 @@ list=`for i in $dir/boot/vmlinu[xz]-* /vmlinu[xz]-* ; do
       done`
 #Chequear por linux.
 while [ "x$list" != "x" ] ; do
-  linux=`version_find_latest $list`
-  if [[ ${DISTRIB_DESCRIPTION} = "" ]] | [[ ${GRUB_DEVICE} = "" ]]; then
-  echo ""
-  else
-  echo "** "${DISTRIB_DESCRIPTION}" @ "${GRUB_DEVICE}"" >&2
-  fi
-  basename=`basename $linux`
-  dirname=`dirname $linux`
-  rel_dirname=`make_system_path_relative_to_its_root ${dir}`
-  version=`echo $basename | sed -e "s,^[^0-9]*-,,g"`
-  alt_version=`echo $version | sed -e "s,\.old$,,g"`
-  
-  for b in "initrd.img-${version}" "initrd-${version}.img" \
-   "initrd-${version}" "initrd.img-${alt_version}" \
-   "initrd-${alt_version}.img" "initrd-${alt_version}"; do
-  if test -e "${dir}/boot/${b}"; then
-      initrd="$b"
-      break
-    fi
-  done
-  if test -n "${initrd}"; then
-    # echo "Encontrada imagen initrd @ ${dirname}/${initrd}" >&2
-    local if_initrd="initrd /boot/${initrd}"
-  else
-echo ""
-  fi
+
+check_OSkernel
+check_ramdisk
+
+if [ "${DISTRIB_DESCRIPTION}" != "" ];then
 grub_common_vars
-if [[ -f ${dir}/etc/lsb-release ]];then
-. $dir/etc/lsb-release
 otherlinux_entry 
 else
 generic_otherlinux_entry
 fi
+
 list=`echo $list | tr ' ' '\n' | grep -vx $linux | tr '\n' ' '`
 done
 done
@@ -252,10 +248,10 @@ function check_WINDOWS()
 for dir in /mnt/*?* ; do
   # Chequea para Vista/Seven bootmgr.
   if [[ -f ${dir}/bootmgr ]] ; then
-    OS_F="Windows Vista/7/8"
+    OS_F="Microsoft Windows Vista/7/8"
   # Chequea para NT/2000/XP NTLDR.
   elif [[ -f ${dir}/ntldr ]] ; then
-    OS_F="Windows NT/2000/XP"
+    OS_F="Microsoft Windows NT/2000/XP"
 else
     continue
   fi
@@ -279,7 +275,7 @@ if [ -e "/boot/grub/grub.cfg" ]; then
 	rm -f /boot/grub/grub.cfg
 fi
 check_DEVICEMAP
-mntpnt
+mntpnt 2> /dev/null
 # cabecera
 cat << EOT > /boot/grub/grub.cfg
 # Config file for GRUB2 - The GNU GRand Unified Bootloader
@@ -358,7 +354,7 @@ ok_fail "Error creando /boot/grub/grub.cfg"
 echo "¡Hecho!"
 echo ""
 echo "Archivo de configuracion de GRUB2 creado en /boot/grub/grub.cfg"
-unmntpnt
+unmntpnt 2> /dev/null
 }
 
 main
