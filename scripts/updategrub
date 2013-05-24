@@ -1,0 +1,364 @@
+#! /bin/sh
+#=========================================================#
+# /usr/bin/findpart
+# Biblioteca para Vegnux NeonatoX OS
+# Proyecto Venezolano VegnuX <http://www.vegnux.org.ve>
+# Por:
+# Carlos Sánchez <mkl.vegnux@gmail.com>
+# Nehemias Velasquez <nehe009@gmail.com>
+# 2007 - 2013
+# GPLv3
+# This program comes with ABSOLUTELY NO WARRANTY.
+#=========================================================#
+
+if [[ "${UID}" != "0" ]]; then
+echo "No eres usuario Root" 
+exit 1
+fi
+#Carga archivo(s) de configuracion.
+prefix="/etc"
+
+# configuracion para updategrub
+updategrub_conf="${prefix}/libneonatox/updategrub.conf"
+if [[ -e "${updategrub_conf}" ]];then
+source "${updategrub_conf}" 2> /dev/null
+else 
+echo " * No existe ${updategrub_conf} *"
+echo "Error!"
+exit 1
+fi
+
+# configuracion general para libneonatox
+neonatoxutils_conf="${prefix}/libneonatox/libneonatox.conf"
+if [[ -e "${neonatoxutils_conf}" ]]; then
+source "${neonatoxutils_conf}" 2> /dev/null
+else
+echo " * No existe ${neonatoxutils_conf} *"
+echo "Error!"
+exit 1
+fi
+neonatoxutils_functions="${prefix}/libneonatox/libneonatoxtools"
+if [[ -e "${neonatoxutils_functions}" ]]; then
+source "${neonatoxutils_functions}" 2> /dev/null
+else
+echo " * No existe ${neonatoxutils_functions} *"
+exit 1
+echo "Error!"
+fi
+
+if [[ -e "/usr/lib/grub/grub-mkconfig_lib" ]]; then
+. /usr/lib/grub/grub-mkconfig_lib 2> /dev/null #Se instala con GRUB2. 
+else
+echo " * No esta instalado GRUB2 *"
+exit 1
+echo "Error!"
+fi
+
+# funciones generales
+# 1. función mntpnt
+# Descripción: genera en /mnt puntos de montaje 
+# según los UUID encontrados en /dev/disk/by-uuid
+##############################
+function mntpnt()
+{
+# descartar swap y /
+SWAP_UUID="/dev/disk/by-uuid/$(blkid | grep swap | awk '{print $2}' | sed 's:UUID=::g' | sed 's:\"::g')"
+ROOTFS_UUID="/dev/disk/by-uuid/$(grub-probe --target=fs_uuid / )"
+devls=$(ls /dev/disk/by-uuid/*)
+for i in ${devls};do
+	if [[ ${SWAP_UUID} = ${i} ]];then
+		continue
+	elif [[ ${ROOTFS_UUID} = ${i} ]];then
+		continue
+	else
+		mkdir /mnt/$(basename ${i}) 
+		mount -t auto ${i} /mnt/$(basename ${i})
+	fi
+done
+}
+# fin de mntpnt
+
+# 2. función unmntpnt
+##############################
+# Descripción: desmonta todos los puntos creados
+# por mntpnt.
+##############################
+function unmntpnt()
+{
+# descartar swap y /
+SWAP_UUID="/dev/disk/by-uuid/$(blkid | grep swap | awk '{print $2}' | sed 's:UUID=::g' | sed 's:\"::g')"
+ROOTFS_UUID="/dev/disk/by-uuid/$(grub-probe --target=fs_uuid / )"
+devls=$(ls /dev/disk/by-uuid/* 2> /dev/null)
+for i in $devls;do
+	if [[ ${SWAP_UUID} = ${i} ]];then
+		continue
+	elif [[ ${ROOTFS_UUID} = ${i} ]];then
+		continue
+	else
+		umount /mnt/$(basename ${i})
+		rmdir  /mnt/$(basename ${i})
+	fi	
+done
+}
+# fin de mntpnt
+
+# 2. función check_DEVICEMAP
+##############################
+# Descripción: verifica que exista el fichero 
+# /boot/grub/device.map
+##############################
+
+function check_DEVICEMAP()
+{
+if [[ -e /boot/grub/device.map ]]; then
+continue
+else
+grub-mkdevicemap --no-floppy --device-map=/boot/grub/device.map
+fi
+}
+
+# fin de check_DEVICEMAP
+
+# funciones específicas
+# 1. función check_NEONATOX
+# Description:
+##############################
+function check_NEONATOX()
+{
+dir=/
+list=`for i in /boot/vmlinu[xz]-* /vmlinu[xz]-* ; do
+        if grub_file_is_not_garbage "$i" ; then echo -n "$i " ; fi
+      done`
+while [ "x$list" != "x" ] ; do
+  linux=`version_find_latest $list`
+  if [[ ${DISTRIB_DESCRIPTION} = "" ]] | [[ ${GRUB_DEVICE} = "" ]]; then
+  echo ""
+  else
+  echo "** "${DISTRIB_DESCRIPTION}" @ "${GRUB_DEVICE}"" >&2
+  fi
+  basename=`basename $linux`
+  dirname=`dirname $linux`
+  rel_dirname=`make_system_path_relative_to_its_root ${dir}`
+  version=`echo $basename | sed -e "s,^[^0-9]*-,,g"`
+  alt_version=`echo $version | sed -e "s,\.old$,,g"`
+  for a in "initrd.img-${version}" "initrd-${version}.img" \
+   "initrd-${version}" "initrd.img-${alt_version}" \
+   "initrd-${alt_version}.img" "initrd-${alt_version}"; do
+  if test -e "/boot/${a}" ; then
+      initrd="$a"
+      break
+    fi
+  done
+  if test -n "${initrd}" ; then
+    # echo "Encontrada imagen initrd @ ${dir}/${initrd}" >&2
+    if_initrd="initrd /boot/${initrd}"
+  else
+echo ""
+  fi
+grub_common_vars
+if [[ -f ${dir}/etc/lsb-release ]];then
+. $dir/etc/lsb-release
+
+	if [[ "${if_initrd}" == "" ]];then
+		single_neonatox_entry # si no existe el initrd
+	else
+		neonatox_entry # si existe el initrd
+	fi
+	
+fi
+list=`echo $list | tr ' ' '\n' | grep -vx $linux | tr '\n' ' '`
+done
+}
+# fin de check_NEONATOX
+
+# 2. función check_OTHERLINUX
+# Description:
+##############################
+function check_OTHERLINUX()
+{
+for dir in /mnt/*?* ; do
+list=`for i in $dir/boot/vmlinu[xz]-* /vmlinu[xz]-* ; do
+        if grub_file_is_not_garbage "$i" ; then echo -n "$i " ; fi
+      done`
+#Chequear por linux.
+while [ "x$list" != "x" ] ; do
+  linux=`version_find_latest $list`
+  if [[ ${DISTRIB_DESCRIPTION} = "" ]] | [[ ${GRUB_DEVICE} = "" ]]; then
+  echo ""
+  else
+  echo "** "${DISTRIB_DESCRIPTION}" @ "${GRUB_DEVICE}"" >&2
+  fi
+  basename=`basename $linux`
+  dirname=`dirname $linux`
+  rel_dirname=`make_system_path_relative_to_its_root ${dir}`
+  version=`echo $basename | sed -e "s,^[^0-9]*-,,g"`
+  alt_version=`echo $version | sed -e "s,\.old$,,g"`
+  
+  for b in "initrd.img-${version}" "initrd-${version}.img" \
+   "initrd-${version}" "initrd.img-${alt_version}" \
+   "initrd-${alt_version}.img" "initrd-${alt_version}"; do
+  if test -e "${dir}/boot/${b}"; then
+      initrd="$b"
+      break
+    fi
+  done
+  if test -n "${initrd}"; then
+    # echo "Encontrada imagen initrd @ ${dirname}/${initrd}" >&2
+    local if_initrd="initrd /boot/${initrd}"
+  else
+echo ""
+  fi
+grub_common_vars
+if [[ -f ${dir}/etc/lsb-release ]];then
+. $dir/etc/lsb-release
+otherlinux_entry 
+else
+generic_otherlinux_entry
+fi
+list=`echo $list | tr ' ' '\n' | grep -vx $linux | tr '\n' ' '`
+done
+done
+}
+# fin de check_OTHERLINUX
+
+# 3. función check_ANDROIDX86
+# Description:
+##############################
+function check_ANDROIDX86()
+{
+for dir in /mnt/*?*/android-*;do
+	# chequeando que exista el kernel
+	if [[ -f ${dir}/kernel ]]; then
+		ANDRO_OS=$(basename ${dir})
+	else
+	continue
+	fi
+grub_common_vars
+if [[ ${DISTRIB_DESCRIPTION} = "" ]] | [[ ${GRUB_DEVICE} = "" ]]; then
+  echo ""
+  else
+echo "** "${ANDRO_OS}" @ "${GRUB_DEVICE}"" >&2
+fi
+android_entry
+done
+}
+# fin de check_ANDROIDX86
+
+# 4. función check_WINDOWS
+# Description:
+##############################
+function check_WINDOWS()
+{
+for dir in /mnt/*?* ; do
+  # Chequea para Vista/Seven bootmgr.
+  if [[ -f ${dir}/bootmgr ]] ; then
+    OS_F="Windows Vista/7/8"
+  # Chequea para NT/2000/XP NTLDR.
+  elif [[ -f ${dir}/ntldr ]] ; then
+    OS_F="Windows NT/2000/XP"
+else
+    continue
+  fi
+grub_common_vars
+  if [[ ${DISTRIB_DESCRIPTION} = "" ]] | [[ ${GRUB_DEVICE} = "" ]]; then
+  continue
+  else
+echo "** "${OS_F}" @ "${GRUB_DEVICE}"" >&2
+fi
+windows_entry
+done
+}
+# fin de check_WINDOWS
+
+# función principal
+function main()
+{
+#crea respaldo del antiguo grub.cfg
+if [ -e "/boot/grub/grub.cfg" ]; then
+	cp /boot/grub/grub.cfg /boot/grub/grub.cfg-$(date +%Y%m%d%H%m).old	# por fecha y hora
+	rm -f /boot/grub/grub.cfg
+fi
+check_DEVICEMAP
+mntpnt
+# cabecera
+cat << EOT > /boot/grub/grub.cfg
+# Config file for GRUB2 - The GNU GRand Unified Bootloader
+# /boot/grub/grub.cfg
+# File generated by $programa $version, don't edit!
+# Proyecto Vegnux 2007-2013
+#
+set timeout=20
+set default=0
+set lang=es
+insmod gettext
+
+if [ -e "/usr/share/grub/fonts/unifont.pf2" ]; then
+	loadfont /usr/share/grub/fonts/unifont.pf2
+	loadfont /usr/share/grub/fonts/10x20.pf2
+	insmod vbe
+	insmod gfxterm
+	set gfxmode="1280x800;1024x768;800x600;640x480"
+	terminal_input console
+	terminal_output gfxterm
+	insmod png
+	background_image /boot/neonatox.png
+else 
+	echo "Loading Linux ..."
+fi
+EOT
+# fin de la cabecera
+# inicio del contenido de grub segun los sistemas operativos que se encuentren
+cat << EOF >> /boot/grub/grub.cfg
+
+#######################################
+# BEGIN NEONATOX
+EOF
+check_NEONATOX
+cat << EOF >> /boot/grub/grub.cfg
+# END NEONATOX
+#######################################
+EOF
+cat << EOF >> /boot/grub/grub.cfg
+#######################################
+# BEGIN OTHER LINUX
+EOF
+check_OTHERLINUX
+cat << EOF >> /boot/grub/grub.cfg
+# END OTHER LINUX
+#######################################
+EOF
+cat << EOF >> /boot/grub/grub.cfg
+#######################################
+# BEGIN ANDROID x86
+EOF
+check_ANDROIDX86
+cat << EOF >> /boot/grub/grub.cfg
+# END ANDROID x86
+#######################################
+EOF
+cat << EOF >> /boot/grub/grub.cfg
+#######################################
+# BEGIN WINDOWS
+EOF
+check_WINDOWS
+cat << EOF >> /boot/grub/grub.cfg
+# END WINDOWS
+#######################################
+EOF
+# fin del contenido del grub
+
+if [ -e "/boot/grub/grub.cfg" ]; then
+continue
+else
+echo "$red No se pudo crear /boot/grub/grub.cfg $normal"
+echo "$red Pude que no tenga GRUB2 instalado en esta particion. $normal" 
+fi
+
+ok_fail "Error creando /boot/grub/grub.cfg"
+echo "¡Hecho!"
+echo ""
+echo "Archivo de configuracion de GRUB2 creado en /boot/grub/grub.cfg"
+unmntpnt
+}
+
+main

@@ -13,7 +13,7 @@
 #=========================================================#
 #===============Inicio de Programa=================#
 #variables
-export neover="n0.5.1 n0.5.2 n0.5.3 n06.1 n06" # colocar las versiones a la inversa
+export neover="n0.5.1 n0.5.2 n0.5.3 n06.1 n06.2" # colocar las versiones a la inversa
 export workdir="$(pwd)"
 export nhofilesdir="/var/nhopkg/files"
 export neoupdatefilesdir="/tmp/neoupdate/files"

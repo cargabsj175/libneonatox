@@ -16,7 +16,7 @@
 # set the lsb_release file for detect neonatox version
 . /etc/lsb-release
 # testing neonatox version
-if [ ${DISTRIB_RELEASE} = 06.1 ]; then
+if [ ${DISTRIB_RELEASE} = 06.2 ]; then
 export nserie=n06
 elif [ ${DISTRIB_RELEASE} = 0.5.1 ]; then
 export nserie=n05

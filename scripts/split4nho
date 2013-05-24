@@ -118,7 +118,7 @@ EOT
 chmod 0755 ${workdir}/${pkgbase}-${splitlist}-${pkgver}/build.split
 # Generando tarball tomando en cuenta la version de neonatox
 cd ${workdir}
-if [[ ${DISTRIB_RELEASE} == 06.1 ||  ${DISTRIB_RELEASE} == 0.5.1 ]]; then
+if [[ ${DISTRIB_RELEASE} == 06.2 ||  ${DISTRIB_RELEASE} == 0.5.1 ]]; then
 tar cjf ${pkgbase}-${splitlist}-${pkgver}.tar.bz2 ${pkgbase}-${splitlist}-${pkgver}
 rm -rf ${pkgbase}-${splitlist}-${pkgver}
 export pkgmd5=$(md5sum ${pkgbase}-${splitlist}-${pkgver}.tar.bz2)

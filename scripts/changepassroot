@@ -17,7 +17,7 @@ if [[ "${UID}" != "0" ]]; then
 	exit 1
 fi
 #Carga archivo de configuracion.
-prefix="/usr/lib"
+prefix="/etc"
 neonatoxutils_conf="${prefix}/libneonatox/libneonatox.conf"
 if [[ -e "${neonatoxutils_conf}" ]]; then
 	source "${neonatoxutils_conf}" 2> /dev/null
