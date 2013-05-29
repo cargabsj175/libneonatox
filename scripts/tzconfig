@@ -1,0 +1,300 @@
+#! /bin/sh
+#=========================================================#
+# /usr/bin/tzconfig
+# Libreria para Vegnux NeonatoX OS
+# Proyecto Venezolano VegnuX <http://www.vegnux.org.ve>
+# Por:
+# Carlos Sánchez <mkl.vegnux@gmail.com>
+# Nehemias Velasquez <nehe009@gmail.com>
+# 2007 - 2013
+# GPLv3
+# This program comes with ABSOLUTELY NO WARRANTY.
+#=========================================================#
+#===============Inicio de Programa=================#
+#Check if running as root.
+if [[ "${UID}" != "0" ]]; then
+	echo "No eres usuario Root" 
+	exit 1
+fi
+
+function help(){
+    echo "tzconfig - Proyecto VegnuX 2007-2013 (GPLv3)"
+	echo ""
+	echo "Uso: tzconfig [OPTION] [ZONA_HORARIA]"
+	echo ""
+	echo "-h, --help: Muestra esta información."
+	echo "-e Asistente basico para añadir informacion al usuario."
+	echo "-b Edita informacion sin asistente."
+}
+
+function set_time_zone(){
+TZCONFIG="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria" \
+"America" \
+"Europe")"
+if [ "$?" = "1" ]; then #chequea si aprete cerrar o cancelar o ESC
+TZCONFIG="0"
+exit
+fi
+if [[ "$TZCONFIG" == "America" ]];then
+TZCONFIG_2="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria - America" \
+Argentina \
+Indiana \
+Kentucky \
+North_Dakota \
+Adak \
+Anchorage \
+Anguilla \
+Antigua \
+Araguaina \
+Aruba \
+Asuncion \
+Atikokan \
+Atka \
+Bahia \
+Barbados \
+Belem \
+Belize \
+Blanc-Sablon \
+Boa_Vista \
+Bogota \
+Boise \
+Buenos_Aires \
+Cambridge_Bay \
+Campo_Grande \
+Cancun \
+Caracas \
+Catamarca \
+Cayenne \
+Cayman \
+Chicago \
+Chihuahua \
+Coral_Harbour \
+Cordoba \
+Costa_Rica \
+Cuiaba \
+Curacao \
+Danmarkshavn \
+Dawson \
+Dawson_Creek \
+Denver \
+Detroit \
+Dominica \
+Edmonton \
+Eirunepe \
+El_Salvador \
+Ensenada \
+Fort_Wayne \
+Fortaleza \
+Glace_Bay \
+Godthab \
+Goose_Bay \
+Grand_Turk \
+Grenada \
+Guadeloupe \
+Guatemala \
+Guayaquil \
+Guyana \
+Halifax \
+Havana \
+Hermosillo \
+Indianapolis \
+Inuvik  \
+Iqaluit \
+Jamaica \
+Jujuy \
+Juneau \
+Knox_IN \
+La_Paz \
+Lima \
+Los_Angeles \
+Louisville \
+Maceio \
+Managua \
+Manaus \
+Marigot \
+Martinique \
+Mazatlan \
+Mendoza \
+Menominee \
+Merida \
+Mexico_City \
+Miquelon \
+Moncton \
+Monterrey \
+Montevideo \
+Montreal \
+Montserrat \
+Nassau \
+New_York \
+Nipigon \
+Nome \
+Noronha \
+Panama \
+Pangnirtung \
+Paramaribo \
+Phoenix \
+Port-au-Prince \
+Port_of_Spain \
+Porto_Acre \
+Porto_Velho \
+Puerto_Rico \
+Rainy_River \
+Rankin_Inlet \
+Recife \
+Regina \
+Resolute \
+Rio_Branco \
+Rosario \
+Santarem \
+Santiago \
+Santo_Domingo \
+Sao_Paulo \
+Scoresbysund \
+Shiprock \
+St_Barthelemy \
+St_Johns \
+St_Kitts \
+St_Lucia \
+St_Thomas \
+St_Vincent \
+Swift_Current \
+Tegucigalpa \
+Thule \
+Thunder_Bay \
+Tijuana \
+Toronto \
+Tortola \
+Vancouver \
+Virgin \
+Whitehorse \
+Winnipeg \
+Yakutat \
+Yellowknife)"
+TZCONFIG=$TZCONFIG/$TZCONFIG_2
+if [[ "$TZCONFIG_2" == Argentina ]];then
+TZCONFIG_3="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria - America/Argentina" \
+Buenos_Aires \
+Catamarca \
+ComodRivadavia \
+Cordoba \
+Jujuy \
+La_Rioja \
+Mendoza \
+Rio_Gallegos \
+Salta \
+San_Juan \
+San_Luis \
+Tucuman \
+Ushuaia)"
+TZCONFIG=$TZCONFIG/$TZCONFIG_3
+elif [[ "$TZCONFIG_2" == "Indiana" ]];then
+TZCONFIG_3="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria - America/Indiana" \
+Indianapolis \
+Knox \
+Marengo \
+Petersburg \
+Tell_City \
+Vevay \
+Vincennes \
+Winamac)"
+TZCONFIG=$TZCONFIG/$TZCONFIG_3
+elif [[ "$TZCONFIG_2" == "Kentucky" ]];then
+TZCONFIG_3="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria - America/Kentucky" \
+Louisville \
+Monticello)"
+TZCONFIG=$TZCONFIG/$TZCONFIG_3
+elif [[ "$TZCONFIG_2" == "North_Dakota" ]];then
+TZCONFIG_3="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria - America/North_Dakota" \
+Center \
+New_Salem)"
+TZCONFIG=$TZCONFIG/$TZCONFIG_3
+else
+echo ""
+fi
+elif [[ "$TZCONFIG" == "Europe" ]];then
+TZCONFIG_2="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria - Europe" \
+Amsterdam \
+Andorra \
+Athens \
+Belfast \
+Belgrade \
+Berlin \
+Bratislava \
+Brussels \
+Bucharest \
+Budapest \
+Chisinau \
+Copenhagen \
+Dublin \
+Gibraltar \
+Guernsey \
+Helsinki \
+Isle_of_Man \
+Istanbul \
+Jersey \
+Kaliningrad \
+Kiev \
+Lisbon \
+Ljubljana \
+London \
+Luxembourg \
+Madrid \
+Malta \
+Mariehamn \
+Minsk \
+Monaco \
+Moscow \
+Nicosia \
+Oslo \
+Paris \
+Podgorica \
+Prague \
+Riga \
+Rome \
+Samara \
+San_Marino \
+Sarajevo \
+Simferopol \
+Skopje \
+Sofia \
+Stockholm \
+Tallinn \
+Tirane \
+Tiraspol \
+Uzhgorod \
+Vaduz \
+Vatican \
+Vienna \
+Vilnius \
+Volgograd \
+Warsaw \
+Zagreb \
+Zaporozhye \
+Zurich)"
+TZCONFIG=$TZCONFIG/$TZCONFIG_2
+else
+echo ""
+fi
+}
+
+
+if [[ "$1" = "-h" || "$1" = "--help" ]]; then
+help
+exit 0
+elif [[ "$1" = "-e" ]]; then
+set_time_zone
+echo "La zona horaria elegida es: ${TZCONFIG}"
+cp --remove-destination /usr/share/zoneinfo/${TZCONFIG} /etc/localtime
+exit 0
+elif [[ "$1" = "-b" ]]; then
+if [[ ${2} = "" ]];then
+echo "No ha introducido ninguna zona horaria"
+else
+cp --remove-destination /usr/share/zoneinfo/"${2}" /etc/localtime
+echo "La zona horaria elegida es: ${2}"
+exit 0
+fi
+fi
+echo ""
+echo "Use \"--help\" para más detalles."
+#===============Fin de Programa=================#
