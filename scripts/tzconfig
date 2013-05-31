@@ -29,13 +29,71 @@ function help(){
 
 function set_time_zone(){
 TZCONFIG="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria" \
+"Africa" \
 "America" \
+"Asia" \
 "Europe")"
 if [ "$?" = "1" ]; then #chequea si aprete cerrar o cancelar o ESC
 TZCONFIG="0"
 exit
 fi
-if [[ "$TZCONFIG" == "America" ]];then
+if [[ "$TZCONFIG" == "Africa" ]];then
+TZCONFIG_2="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria - Africa" \
+Abidjan \
+Accra \
+Addis_Ababa \
+Algiers \
+Asmara \
+Asmera \
+Bamako \
+Bangui \
+Banjul \
+Bissau \
+Blantyre \
+Brazzaville \
+Bujumbura \
+Cairo \
+Casablanca \
+Ceuta \
+Conakry \
+Dakar \
+Dar_es_Salaam \
+Djibouti \
+Douala \
+El_Aaiun \
+Freetown \
+Gaborone \
+Harare \
+Johannesburg \
+Kampala \
+Khartoum \
+Kigali \
+Kinshasa \
+Lagos \
+Libreville \
+Lome \
+Luanda \
+Lubumbashi \
+Lusaka \
+Malabo \
+Maputo \
+Maseru \
+Mbabane \
+Mogadishu \
+Monrovia \
+Nairobi \
+Ndjamena \
+Niamey \
+Nouakchott \
+Ouagadougou \
+Porto-Novo \
+Sao_Tome \
+Timbuktu \
+Tripoli \
+Tunis \
+Windhoek)"
+TZCONFIG=$TZCONFIG/$TZCONFIG_2
+elif [[ "$TZCONFIG" == "America" ]];then
 TZCONFIG_2="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria - America" \
 Argentina \
 Indiana \
@@ -211,6 +269,99 @@ TZCONFIG=$TZCONFIG/$TZCONFIG_3
 else
 echo ""
 fi
+elif [[ "$TZCONFIG" == "Asia" ]];then
+TZCONFIG_2="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria - Asia" \
+Aden \
+Almaty \
+Amman \
+Anadyr \
+Aqtau \
+Aqtobe \
+Ashgabat \
+Ashkhabad \
+Baghdad \
+Bahrain \
+Baku \
+Bangkok \
+Beirut \
+Bishkek \
+Brunei \
+Calcutta \
+Choibalsan \
+Chongqing \
+Chungking \
+Colombo \
+Dacca \
+Damascus \
+Dhaka \
+Dili \
+Dubai \
+Dushanbe \
+Gaza \
+Harbin \
+Ho_Chi_Minh \
+Hong_Kong \
+Hovd \
+Irkutsk \
+Istanbul \
+Jakarta \
+Jayapura \
+Jerusalem \
+Kabul \
+Kamchatka \
+Karachi \
+Kashgar \
+Kathmandu \
+Katmandu \
+Kolkata \
+Krasnoyarsk \
+Kuala_Lumpur \
+Kuching \
+Kuwait \
+Macao \
+Macau \
+Magadan \
+Makassar \
+Manila \
+Muscat \
+Nicosia \
+Novosibirsk \
+Omsk \
+Oral \
+Phnom_Penh \
+Pontianak \
+Pyongyang \
+Qatar \
+Qyzylorda \
+Rangoon \
+Riyadh \
+Riyadh87 \
+Riyadh88 \
+Riyadh89 \
+Saigon \
+Sakhalin \
+Samarkand \
+Seoul \
+Shanghai \
+Singapore \
+Taipei \
+Tashkent \
+Tbilisi \
+Tehran \
+Tel_Aviv \
+Thimbu \
+Thimphu \
+Tokyo \
+Ujung_Pandang \
+Ulaanbaatar \
+Ulan_Bator \
+Urumqi \
+Vientiane \
+Vladivostok \
+Yakutsk \
+Yekaterinburg \
+Yerevan)"
+TZCONFIG=$TZCONFIG/$TZCONFIG_2
 elif [[ "$TZCONFIG" == "Europe" ]];then
 TZCONFIG_2="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria - Europe" \
 Amsterdam \
