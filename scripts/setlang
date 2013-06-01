@@ -1,0 +1,28 @@
+#! /bin/sh
+#=========================================================#
+# /usr/bin/setlang
+# Libreria para Vegnux NeonatoX OS
+# Proyecto Venezolano VegnuX <http://www.vegnux.org.ve>
+# Por:
+# Carlos Sánchez <mkl.vegnux@gmail.com>
+# Nehemias Velasquez <nehe009@gmail.com>
+# 2007 - 2013
+# GPLv3
+# This program comes with ABSOLUTELY NO WARRANTY.
+#=========================================================#
+#===============Inicio de Programa=================#
+#Check if running as root.
+if [[ "${UID}" != "0" ]]; then
+	echo "No eres usuario Root" 
+	exit 1
+fi
+
+function help(){
+    echo "setlang - Proyecto VegnuX 2007-2013 (GPLv3)"
+	echo ""
+	echo "Uso: setlang [OPTION] [ZONA_HORARIA]"
+	echo ""
+	echo "-h, --help: Muestra esta información."
+	echo "-e Asistente basico para añadir informacion al usuario."
+	echo "-b Edita informacion sin asistente."
+}
