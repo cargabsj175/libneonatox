@@ -23,7 +23,7 @@ function help(){
 	echo "Uso: tzconfig [OPTION] [ZONA_HORARIA]"
 	echo ""
 	echo "-h, --help: Muestra esta información."
-	echo "-e Asistente basico para añadir informacion al usuario."
+	echo "-e Asistente basico para establecer la Zona Horaria."
 	echo "-b Edita informacion sin asistente."
 }
 

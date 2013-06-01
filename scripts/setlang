@@ -23,22 +23,23 @@ function help(){
 	echo "Uso: setlang [OPTION] [ZONA_HORARIA]"
 	echo ""
 	echo "-h, --help: Muestra esta información."
-	echo "-e Asistente basico para añadir informacion al usuario."
+	echo "-e Asistente basico para establecer el Idioma."
 	echo "-b Edita informacion sin asistente."
 }
 # menu principal
-SETLANGUAGE="$(zenity --width=360 --height=380 --list --column "N°" --column "Language" --title="Establecer Idioma" \
+function set_language(){
+SETLANGUAGE="$(zenity --width=400 --height=380 --list --column "No." --column "Language" --title="Establecer Idioma" \
 1 "Castellano - Spanish" \
 2 "Inglés - English" \
-3 "Portugués - Portuguese - Português" \
-4 "Ruso - Russian - Русский язык")"
+3 "Portugués - Português" \
+4 "Ruso - Русский язык")"
 if [ "$?" = "1" ]; then #chequea si aprete cerrar o cancelar o ESC
 SETLANGUAGE="0"
 exit
 fi
 
 if [[ "$SETLANGUAGE" == "1" ]];then
-SETLANGUAGE_2="$(zenity --width=360 --height=380 --list --column "" --title="Establecer Idioma - Castellano - Spanish" \
+SETLANGUAGE_2="$(zenity --width=400 --height=380 --list --column "" --title="Establecer Idioma - Castellano - Spanish" \
 es_AR es_AR.iso88591 es_AR.utf8 es_BO es_BO.iso88591 es_BO.utf8 es_CL es_CL.iso88591 es_CL.utf8  es_CO es_CO.iso88591 es_CO.utf8 \
 es_CR es_CR.iso88591 es_CR.utf8 es_DO es_DO.iso88591 es_DO.utf8 es_EC es_EC.iso88591 es_EC.utf8 es_ES es_ES@euro es_ES.iso88591 es_ES.iso885915@euro es_ES.utf8 \
 es_GT es_GT.iso88591 es_GT.utf8 es_HN es_HN.iso88591 es_HN.utf8 es_MX es_MX.iso88591 es_MX.utf8 es_NI es_NI.iso88591 es_NI.utf8 \
@@ -46,22 +47,59 @@ es_PA es_PA.iso88591 es_PA.utf8 es_PE es_PE.iso88591 es_PE.utf8 es_PR es_PR.iso8
 es_SV es_SV.iso88591 es_SV.utf8 es_US es_US.iso88591 es_US.utf8 es_UY es_UY.iso88591 es_UY.utf8 es_VE es_VE.iso88591 es_VE.utf8)"
 SETLANGUAGE=$SETLANGUAGE_2
 elif [[ "$SETLANGUAGE" == "2" ]];then
-SETLANGUAGE_2="$(zenity --width=360 --height=380 --list --column "" --title="Establecer Idioma - Inglés - English" \
+SETLANGUAGE_2="$(zenity --width=400 --height=380 --list --column "" --title="Establecer Idioma - Inglés - English" \
 en_AG en_AG.utf8 en_AU en_AU.iso88591 en_AU.utf8 en_BW en_BW.iso88591 en_BW.utf8 en_CA en_CA.iso88591 en_CA.utf8 \
 en_DK en_DK.iso88591 en_DK.utf8 en_GB en_GB.iso88591 en_GB.utf8 en_HK en_HK.iso88591 en_HK.utf8 en_IE en_IE@euro en_IE.iso88591 en_IE.iso885915@euro en_IE.utf8 \
 en_IN en_IN.utf8 en_NG en_NG.utf8 en_NZ en_NZ.iso88591 en_NZ.utf8 en_PH en_PH.iso88591 en_PH.utf8 \
 en_SG en_SG.iso88591 en_SG.utf8 en_US en_US.iso88591 en_US.utf8 en_ZA en_ZA.iso88591 en_ZA.utf8 en_ZW en_ZW.iso88591 en_ZW.utf8)"
 SETLANGUAGE=$SETLANGUAGE_2
 elif [[ "$SETLANGUAGE" == "3" ]];then
-SETLANGUAGE_2="$(zenity --width=360 --height=380 --list --column "" --title="Establecer Idioma - Portugués - Portuguese - Português" \
+SETLANGUAGE_2="$(zenity --width=400 --height=380 --list --column "" --title="Establecer Idioma - Portugués - Português" \
 pt_BR pt_BR.iso88591 pt_BR.utf8 pt_PT pt_PT@euro pt_PT.iso88591 pt_PT.iso885915@euro pt_PT.utf8)"
 SETLANGUAGE=$SETLANGUAGE_2
 elif [[ "$SETLANGUAGE" == "4" ]];then
-SETLANGUAGE_2="$(zenity --width=360 --height=380 --list --column "" --title="Establecer Idioma - Ruso - Russian - Русский язык" \
+SETLANGUAGE_2="$(zenity --width=400 --height=380 --list --column "" --title="Establecer Idioma - Ruso - Русский язык" \
 ru_RU ru_RU.iso88595 ru_RU.koi8r ru_RU.utf8 ru_UA ru_UA.koi8u ru_UA.utf8)"
 SETLANGUAGE=$SETLANGUAGE_2
 else
 echo ""
 fi
+}
 
-echo "$SETLANGUAGE"
+function set_language_xkb(){
+	
+}
+
+if [[ "$1" = "-h" || "$1" = "--help" ]]; then
+help
+exit 0
+elif [[ "$1" = "-e" ]]; then
+set_language
+echo "El idioma elegido es: $SETLANGUAGE"
+cat << EOT > /etc/profile.d/05-i18n.sh
+# Begin /etc/profile.d/05-i18n.sh
+export LANG=$SETLANGUAGE
+export LANGUAGE=$SETLANGUAGE
+export LC_MESSAGES=$SETLANGUAGE
+# End /etc/profile.d/05-i18n.sh
+EOT
+exit 0
+elif [[ "$1" = "-b" ]]; then
+if [[ ${2} = "" ]];then
+echo "No ha introducido ningún idioma"
+else
+cat << EOT > /etc/profile.d/05-i18n.sh
+# Begin /etc/profile.d/05-i18n.sh
+export LANG=${2}
+export LANGUAGE=${2}
+export LC_MESSAGES=${2}
+# End /etc/profile.d/05-i18n.sh
+EOT
+echo "El idioma elegido es: ${2}"
+exit 0
+fi
+fi
+echo ""
+echo "Use \"--help\" para más detalles."
+#===============Fin de Programa=================#
+
