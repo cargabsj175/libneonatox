@@ -20,11 +20,13 @@ fi
 function help(){
     echo "setlang - Proyecto VegnuX 2007-2013 (GPLv3)"
 	echo ""
-	echo "Uso: setlang [OPTION] [ZONA_HORARIA]"
+	echo "Uso: setlang [OPTION] [ZONA_HORARIA] o [TECLADO]"
 	echo ""
 	echo "-h, --help: Muestra esta información."
-	echo "-e Asistente basico para establecer el Idioma."
-	echo "-b Edita informacion sin asistente."
+	echo "-e Menú para establecer el Idioma."
+	echo "-b Edita el idioma sin asistente."
+	echo "-k Menú para establecer el teclado."
+	echo "-n Edita el teclado sin asistente."
 }
 # menu principal
 function set_language(){
@@ -67,7 +69,16 @@ fi
 }
 
 function set_language_xkb(){
-	
+SETXKEYBOARD="$(zenity --width=400 --height=380 --list --column "Lang." --column "Desc." --title="Establecer Idioma del teclado" \
+es "(Castellano - Spanish)" \
+latam "(Latino Americano)" \
+pt "(Portugués - Português)" \
+ru "(Ruso - Русский язык)" \
+us "(Inglés - English)")"
+if [ "$?" = "1" ]; then #chequea si aprete cerrar o cancelar o ESC
+SETXKEYBOARD="0"
+exit
+fi
 }
 
 if [[ "$1" = "-h" || "$1" = "--help" ]]; then
@@ -96,6 +107,34 @@ export LC_MESSAGES=${2}
 # End /etc/profile.d/05-i18n.sh
 EOT
 echo "El idioma elegido es: ${2}"
+exit 0
+fi
+elif [[ "$1" = "-k" ]]; then
+set_language_xkb
+echo "El teclado elegido es: $SETXKEYBOARD"
+cat << EOT > /etc/profile.d/06-xkeyboard.sh
+# Begin /etc/profile.d/06-xkeyboard.sh
+if [[ x\$DISPLAY != x ]];then
+setxkbmap $SETXKEYBOARD
+else
+echo ""
+fi
+# End /etc/profile.d/06-xkeyboard.sh
+EOT
+elif [[ "$1" = "-n" ]]; then
+if [[ ${2} = "" ]];then
+echo "No ha introducido ningún teclado"
+else
+cat << EOT > /etc/profile.d/06-xkeyboard.sh
+# Begin /etc/profile.d/06-xkeyboard.sh
+if [[ x\$DISPLAY != x ]];then
+setxkbmap ${2}
+else
+echo ""
+fi
+# End /etc/profile.d/06-xkeyboard.sh
+EOT
+echo "El teclado elegido es: ${2}"
 exit 0
 fi
 fi
