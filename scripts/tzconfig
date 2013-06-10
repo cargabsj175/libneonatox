@@ -47,11 +47,11 @@ Bujumbura Cairo Casablanca Ceuta Conakry Dakar Dar_es_Salaam Djibouti Douala El_
 Johannesburg Kampala Khartoum Kigali Kinshasa Lagos Libreville Lome Luanda Lubumbashi Lusaka Malabo \
 Maputo Maseru Mbabane Mogadishu Monrovia Nairobi Ndjamena Niamey Nouakchott Ouagadougou Porto-Novo Sao_Tome \
 Timbuktu Tripoli Tunis Windhoek)"
-TZCONFIG=$TZCONFIG/$TZCONFIG_2
 if [ "$?" = "1" ]; then #chequea si aprete cerrar o cancelar o ESC
 TZCONFIG_2="0"
 exit
 fi
+TZCONFIG=$TZCONFIG/$TZCONFIG_2
 # zona horaria America
 elif [[ "$TZCONFIG" == "America" ]];then
 TZCONFIG_2="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria - America" \
@@ -67,47 +67,47 @@ Port-au-Prince Port_of_Spain Porto_Acre Porto_Velho Puerto_Rico Rainy_River Rank
 Santarem Santiago Santo_Domingo Sao_Paulo Scoresbysund Shiprock St_Barthelemy St_Johns St_Kitts St_Lucia St_Thomas St_Vincent \
 Swift_Current Tegucigalpa Thule Thunder_Bay Tijuana Toronto Tortola Vancouver Virgin Whitehorse Winnipeg Yakutat \
 Yellowknife)"
-TZCONFIG=$TZCONFIG/$TZCONFIG_2
 if [ "$?" = "1" ]; then #chequea si aprete cerrar o cancelar o ESC
 TZCONFIG_2="0"
 exit
 fi
+TZCONFIG=$TZCONFIG/$TZCONFIG_2
 # zona horaria America/Argentina
 if [[ "$TZCONFIG_2" == Argentina ]];then
 TZCONFIG_3="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria - America/Argentina" \
 Buenos_Aires Catamarca ComodRivadavia Cordoba Jujuy La_Rioja Mendoza Rio_Gallegos Salta San_Juan San_Luis Tucuman Ushuaia)"
-TZCONFIG=$TZCONFIG/$TZCONFIG_3
 if [ "$?" = "1" ]; then #chequea si aprete cerrar o cancelar o ESC
-TZCONFIG_3="0"
+TZCONFIG_2="0"
 exit
 fi
+TZCONFIG=$TZCONFIG/$TZCONFIG_3
 # zona horaria America/Indiana
 elif [[ "$TZCONFIG_2" == "Indiana" ]];then
 TZCONFIG_3="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria - America/Indiana" \
 Indianapolis Knox Marengo Petersburg Tell_City Vevay Vincennes Winamac)"
-TZCONFIG=$TZCONFIG/$TZCONFIG_3
 if [ "$?" = "1" ]; then #chequea si aprete cerrar o cancelar o ESC
-TZCONFIG_3="0"
+TZCONFIG_2="0"
 exit
 fi
+TZCONFIG=$TZCONFIG/$TZCONFIG_3
 # zona horaria America/Kentucky
 elif [[ "$TZCONFIG_2" == "Kentucky" ]];then
 TZCONFIG_3="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria - America/Kentucky" \
 Louisville Monticello)"
-TZCONFIG=$TZCONFIG/$TZCONFIG_3
 if [ "$?" = "1" ]; then #chequea si aprete cerrar o cancelar o ESC
-TZCONFIG_3="0"
+TZCONFIG_2="0"
 exit
 fi
+TZCONFIG=$TZCONFIG/$TZCONFIG_3
 # zona horaria America/North_Dakota
 elif [[ "$TZCONFIG_2" == "North_Dakota" ]];then
 TZCONFIG_3="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria - America/North_Dakota" \
 Center New_Salem)"
-TZCONFIG=$TZCONFIG/$TZCONFIG_3
 if [ "$?" = "1" ]; then #chequea si aprete cerrar o cancelar o ESC
-TZCONFIG_3="0"
+TZCONFIG_2="0"
 exit
 fi
+TZCONFIG=$TZCONFIG/$TZCONFIG_3
 else
 echo ""
 fi
@@ -122,21 +122,21 @@ Macau Magadan Makassar Manila Muscat Nicosia Novosibirsk Omsk Oral Phnom_Penh Po
 Qatar Qyzylorda Rangoon Riyadh Riyadh87 Riyadh88 Riyadh89 Saigon Sakhalin Samarkand Seoul Shanghai \
 Singapore Taipei Tashkent Tbilisi Tehran Tel_Aviv Thimbu Thimphu Tokyo Ujung_Pandang Ulaanbaatar Ulan_Bator Urumqi \
 Vientiane Vladivostok Yakutsk Yekaterinburg Yerevan)"
-TZCONFIG=$TZCONFIG/$TZCONFIG_2
 if [ "$?" = "1" ]; then #chequea si aprete cerrar o cancelar o ESC
 TZCONFIG_2="0"
 exit
 fi
+TZCONFIG=$TZCONFIG/$TZCONFIG_2
 # zona horaria Australia
 elif [[ "$TZCONFIG" == "Australia" ]];then
 TZCONFIG_2="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria - Australia" \
 ACT Adelaide Brisbane Broken_Hill Canberra Currie Darwin Eucla Hobart LHI Lindeman Lord_Howe \
 Melbourne North NSW Perth Queensland South Sydney Tasmania Victoria West Yancowinna)"
-TZCONFIG=$TZCONFIG/$TZCONFIG_2
 if [ "$?" = "1" ]; then #chequea si aprete cerrar o cancelar o ESC
 TZCONFIG_2="0"
 exit
 fi
+TZCONFIG=$TZCONFIG/$TZCONFIG_2
 # zona horaria Europa
 elif [[ "$TZCONFIG" == "Europe" ]];then
 TZCONFIG_2="$(zenity --width=320 --height=380 --list --column "" --title="Zona Horaria - Europe" \
@@ -145,11 +145,11 @@ Dublin Gibraltar Guernsey Helsinki Isle_of_Man Istanbul Jersey Kaliningrad Kiev 
 Malta Mariehamn Minsk Monaco Moscow Nicosia Oslo Paris Podgorica Prague Riga Rome \
 Samara San_Marino Sarajevo Simferopol Skopje Sofia Stockholm Tallinn Tirane Tiraspol Uzhgorod Vaduz \
 Vatican Vienna Vilnius Volgograd Warsaw Zagreb Zaporozhye Zurich)"
-TZCONFIG=$TZCONFIG/$TZCONFIG_2
 if [ "$?" = "1" ]; then #chequea si aprete cerrar o cancelar o ESC
 TZCONFIG_2="0"
 exit
 fi
+TZCONFIG=$TZCONFIG/$TZCONFIG_2
 else
 echo ""
 fi
