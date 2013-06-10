@@ -29,6 +29,7 @@ export ARCH=$(uname -m)
 curdir=$(pwd)
 # setting revision file
 export rev=$(date +20%y%m%d_%H.%M.%S)
+
 function main(){
 urlsrc="http://vegnux.org.ve/repo/${nserie}/sources"
 urlbin="http://vegnux.org.ve/repo/${nserie}/stable/${ARCH}"
@@ -72,10 +73,11 @@ if [[ "$1" = "-h" || "$1" = "--help" ]]; then
 help
 exit 0
 elif [[ "$1" = "--only-code" || "$1" = "-c" ]]; then
-if [[ ${outputdir} == " " ]]; then
+if [[ ${outputdir} == "" ]]; then
 export outputfilename="${outputdir}/list-${nserie}.1-${ARCH}-${rev}"
 echo "Paquetes nuevos y/o actualizados."  >> ${outputfilename}
 echo ""  >> ${outputfilename}
+fi
 main
 unset outputfilename
 exit 0
