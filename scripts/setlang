@@ -110,6 +110,7 @@ export LANGUAGE=$SETLANGUAGE
 export LC_MESSAGES=$SETLANGUAGE
 # End /etc/profile.d/05-i18n.sh
 EOT
+chmod +x /etc/profile.d/05-i18n.sh
 exit 0
 elif [[ "$1" = "-b" ]]; then
 if [[ ${2} = "" ]];then
@@ -122,6 +123,7 @@ export LANGUAGE=${2}
 export LC_MESSAGES=${2}
 # End /etc/profile.d/05-i18n.sh
 EOT
+chmod +x /etc/profile.d/05-i18n.sh
 echo "El idioma elegido es: ${2}"
 exit 0
 fi
@@ -137,6 +139,7 @@ echo ""
 fi
 # End /etc/profile.d/06-xkeyboard.sh
 EOT
+chmod +x /etc/profile.d/06-xkeyboard.sh
 elif [[ "$1" = "-n" ]]; then
 if [[ ${2} = "" ]];then
 echo "No ha introducido ningún teclado"
@@ -150,6 +153,7 @@ echo ""
 fi
 # End /etc/profile.d/06-xkeyboard.sh
 EOT
+chmod +x /etc/profile.d/06-xkeyboard.sh
 echo "El teclado elegido es: ${2}"
 exit 0
 fi

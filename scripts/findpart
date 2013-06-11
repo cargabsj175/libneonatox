@@ -32,99 +32,99 @@ fi
 function tipo_particion()
 {
 case "$tipo" in
-1)tipo_part="FAT12";;              
-2)tipo_part="XENIX root";;            
-3)tipo_part="XENIX usr";;             
-4)tipo_part="FAT16 <32M";;            
-5)tipo_part="Extended";;              
-6)tipo_part="FAT16";;                 
-7)tipo_part="HPFS/NTFS";;             
-8)tipo_part="AIX";;                   
-9)tipo_part="AIX bootable";;          
-a)tipo_part="OS/2 Boot Manager";;     
-b)tipo_part="W95 FAT32";;             
-c)tipo_part="W95 FAT32 (LBA)";;      
-e)tipo_part="W95 FAT16 (LBA)";;       
-f)tipo_part="W95 Ext'd (LBA)";;       
-10)tipo_part="OPUS";;                  
-11)tipo_part="Hidden FAT12";;          
-12)tipo_part="Compaq diagnostics";;    
-14)tipo_part="Hidden FAT16 <32M";;     
-16)tipo_part="Hidden FAT16";;          
-17)tipo_part="Hidden HPFS/NTFS";;      
-18)tipo_part="AST SmartSleep";;
-1b)tipo_part="Hidden W95 FAT32";;      
-1c)tipo_part="Hidden W95 FAT32 (LBA)";;  
-1e)tipo_part="Hidden W95 FAT16 (LBA)";; 
-24)tipo_part="NEC DOS";;              
-39)tipo_part="Plan 9";;                
-3c)tipo_part="PartitionMagic recov";;  
-40)tipo_part="Venix 80286";;           
-41)tipo_part="PPC PReP Boot";;         
-42)tipo_part="SFS";;                   
-4d)tipo_part="QNX4.x";;                
-4e)tipo_part="QNX4.x 2nd part";;       
-4f)tipo_part="QNX4.x 3rd part";;       
-50)tipo_part="OnTrack DM";;            
-51)tipo_part="OnTrack DM6 Aux1";;      
-52)tipo_part="CP/M";;                  
-53)tipo_part="OnTrack DM6 Aux3";;      
-54)tipo_part="OnTrackDM6";;            
-55)tipo_part="EZ-Drive";;              
-56)tipo_part="Golden Bow";;            
-5c)tipo_part="Priam Edisk";;           
-61)tipo_part="SpeedStor";;             
-63)tipo_part="GNU HURD or SysV";;      
-64)tipo_part="Novell Netware 286";;    
-65)tipo_part="Novell Netware 386";;    
-70)tipo_part="DiskSecure Multi-Boot";;  
-75)tipo_part="PC/IX";;                 
-80)tipo_part="Old Minix";;
-81)tipo_part="Minix / old Linux";;     
-82)tipo_part="Swap";;            
-83)tipo_part="Linux";;                 
-84)tipo_part="OS/2 hidden C: drive";;  
-85)tipo_part="Linux extended";;        
-86)tipo_part="NTFS volume set";;       
-87)tipo_part="NTFS volume set";;       
-88)tipo_part="Linux plaintext";;       
-8e)tipo_part="Linux LVM";;             
-93)tipo_part="Amoeba";;                
-94)tipo_part="Amoeba BBT";;            
-9f)tipo_part="BSD/OS";;                
-a0)tipo_part="IBM Thinkpad hibernation";;  
-a5)tipo_part="FreeBSD";;               
-a6)tipo_part="OpenBSD";;               
-a7)tipo_part="NeXTSTEP";;              
-a8)tipo_part="Darwin UFS";;           
-a9)tipo_part="NetBSD";;                
-ab)tipo_part="Darwin boot";;           
-b7)tipo_part="BSDI fs";;               
-b8)tipo_part="BSDI swap";;             
-bb)tipo_part="Boot Wizard hidden";;    
-be)tipo_part="Solaris boot";;          
+1)tipo_part="FAT12";;
+2)tipo_part="XENIX_root";;
+3)tipo_part="XENIX_usr";;
+4)tipo_part="FAT16_<32M";;
+5)tipo_part="Extended";;
+6)tipo_part="FAT16";;
+7)tipo_part="HPFS/NTFS";;
+8)tipo_part="AIX";;
+9)tipo_part="AIX_bootable";;
+a)tipo_part="OS/2_Boot_Manager";;
+b)tipo_part="W95_FAT32";;
+c)tipo_part="W95_FAT32_(LBA)";;
+e)tipo_part="W95_FAT16_(LBA)";;
+f)tipo_part="W95_Ext'd_(LBA)";;
+10)tipo_part="OPUS";;
+11)tipo_part="Hidden_FAT12";;
+12)tipo_part="Compaq_diagnostics";;
+14)tipo_part="Hidden_FAT16_<32M";;
+16)tipo_part="Hidden_FAT16";;
+17)tipo_part="Hidden_HPFS/NTFS";;
+18)tipo_part="AST_SmartSleep";;
+1b)tipo_part="Hidden_W95_FAT32";;
+1c)tipo_part="Hidden_W95_FAT32_(LBA)";;
+1e)tipo_part="Hidden_W95_FAT16_(LBA)";;
+24)tipo_part="NEC_DOS";;
+39)tipo_part="Plan_9";;
+3c)tipo_part="PartitionMagic_recov";;
+40)tipo_part="Venix_80286";;
+41)tipo_part="PPC_PReP_Boot";;
+42)tipo_part="SFS";;
+4d)tipo_part="QNX4.x";;
+4e)tipo_part="QNX4.x_2nd_part";;
+4f)tipo_part="QNX4.x_3rd_part";;
+50)tipo_part="OnTrack_DM";;
+51)tipo_part="OnTrack_DM6_Aux1";;
+52)tipo_part="CP/M";;
+53)tipo_part="OnTrack_DM6_Aux3";;
+54)tipo_part="OnTrackDM6";;
+55)tipo_part="EZ-Drive";;
+56)tipo_part="Golden_Bow";;
+5c)tipo_part="Priam_Edisk";;
+61)tipo_part="SpeedStor";;
+63)tipo_part="GNU_HURD_or_SysV";;
+64)tipo_part="Novell_Netware_286";;
+65)tipo_part="Novell_Netware_386";;
+70)tipo_part="DiskSecure_Multi-Boot";;
+75)tipo_part="PC/IX";;
+80)tipo_part="Old_Minix";;
+81)tipo_part="Minix_/_old_Linux";;
+82)tipo_part="Swap";;
+83)tipo_part="Linux";;
+84)tipo_part="OS/2_hidden_C:_drive";;
+85)tipo_part="Linux_extended";;
+86)tipo_part="NTFS_volume_set";;
+87)tipo_part="NTFS_volume_set";;
+88)tipo_part="Linux_plaintext";;
+8e)tipo_part="Linux_LVM";;
+93)tipo_part="Amoeba";;
+94)tipo_part="Amoeba_BBT";;
+9f)tipo_part="BSD/OS";;
+a0)tipo_part="IBM_Thinkpad_hibernation";;
+a5)tipo_part="FreeBSD";;
+a6)tipo_part="OpenBSD";;
+a7)tipo_part="NeXTSTEP";;
+a8)tipo_part="Darwin_UFS";;
+a9)tipo_part="NetBSD";;
+ab)tipo_part="Darwin_boot";;
+b7)tipo_part="BSDI_fs";;
+b8)tipo_part="BSDI_swap";;
+bb)tipo_part="Boot_Wizard_hidden";;
+be)tipo_part="Solaris_boot";;
 bf)tipo_part="Solaris";;
-c1)tipo_part="DRDOS/sec (FAT-12)";;
-c4)tipo_part="DRDOS/sec (FAT-16)";;
-c6)tipo_part="DRDOS/sec (FAT-16)";;
+c1)tipo_part="DRDOS/sec_(FAT-12)";;
+c4)tipo_part="DRDOS/sec_(FAT-16)";;
+c6)tipo_part="DRDOS/sec_(FAT-16)";;
 c7)tipo_part="Syrinx";;
-da)tipo_part="Non-FS data";;
-db)tipo_part="CP/M / CTOS / ...";;
-de)tipo_part="Dell Utility";;
+da)tipo_part="Non-FS_data";;
+db)tipo_part="CP/M_/_CTOS_/_...";;
+de)tipo_part="Dell_Utility";;
 df)tipo_part="BootIt";;
-e1)tipo_part="DOS access";;
-e3)tipo_part="DOS R/O";;
+e1)tipo_part="DOS_access";;
+e3)tipo_part="DOS_R/O";;
 e4)tipo_part="SpeedStor";;
-eb)tipo_part="BeOS fs";;
+eb)tipo_part="BeOS_fs";;
 ee)tipo_part="GPT";;
-ef)tipo_part="EFI (FAT-12/16/32)";;
-f0)tipo_part="Linux/PA-RISC boot";;
+ef)tipo_part="EFI_(FAT-12/16/32)";;
+f0)tipo_part="Linux/PA-RISC_boot";;
 f1)tipo_part="SpeedStor";;
 f4)tipo_part="SpeedStor";;
-f2)tipo_part="DOS secondary";;
-fb)tipo_part="VMware VMFS";;
-fc)tipo_part="VMware VMKCORE";;
-fd)tipo_part="Linux raid autodetec";;
+f2)tipo_part="DOS_secondary";;
+fb)tipo_part="VMware_VMFS";;
+fc)tipo_part="VMware_VMKCORE";;
+fd)tipo_part="Linux_raid_autodetec";;
 fe)tipo_part="LANstep";;
 ff)tipo_part="BBT";;
 *)tipo_part="Unknown";;
@@ -232,7 +232,7 @@ for i in a b c d e f g; do
     if [ -e "/dev/${DISCO}" ]; then
         for n in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 		do
-		part=hd${DISCO}${n}
+		export part="${DISCO}${n}"
 		nuevohd=$(grep "$part" "/proc/partitions")
 		if [ -e "/dev/$part" ]; then
 			tipo=$(fdisk -l | grep $part | awk '{if ($2 == "*") {print $6};}{if ($2 != "*") {print $5};}')
@@ -241,14 +241,14 @@ for i in a b c d e f g; do
 			sizeA=$(echo "$size / 967777" | bc)
 			if [ "${sizeA}" == "0" ]; then
 				sizeA=$(echo "$size / 967" | bc)
-				taman_part="${sizeA} ${mb}"
+				taman_part="${sizeA}${mb}"
 			else
 				sizeA=$(echo "$size / 967777" | bc)
-				taman_part="${sizeA} ${gb}"
+				taman_part="${sizeA}${gb}"
 			fi			
 			lugar_particiones
-			res=" $part --- ${tipo_part} --- ${taman_part}\\n$res"
-			respart="$part ${restipo}"
+			res="${part} --- ${tipo_part} --- ${taman_part}\\n$res"
+			respart="${part} ${respart}"
 			restipo="${tipo_part} ${restipo}"
 			restaman="${taman_part} ${restaman}"
 		fi		
@@ -262,7 +262,7 @@ for i in a b c d e f g; do
     if [ -e "/dev/${DISCO}" ]; then
         for n in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 		do
-		part=${DISCO}${n}
+		export part="${DISCO}${n}"
 		if [ -e "/dev/$part" ]; then
 			tipo=$(fdisk -l | grep $part | awk '{if ($2 == "*") {print $6};}{if ($2 != "*") {print $5};}')
 			tipo_particion
@@ -270,14 +270,14 @@ for i in a b c d e f g; do
 			sizeA=$(echo "$size / 967777" | bc)
 			if [ "${sizeA}" == "0" ]; then
 				sizeA=$(echo "$size / 967" | bc)
-				taman_part="${sizeA} ${mb}"
+				taman_part="${sizeA}${mb}"
 			else
 				sizeA=$(echo "$size / 967777" | bc)
-				taman_part="${sizeA} ${gb}"
+				taman_part="${sizeA}${gb}"
 			fi			
 			lugar_particiones
-			res=" $part --- ${tipo_part} --- ${taman_part}\\n$res"
-			respart="$part ${restipo}"
+			res="${part} --- ${tipo_part} --- ${taman_part}\\n$res"
+			respart="${part} ${respart}"
 			restipo="${tipo_part} ${restipo}"
 			restaman="${taman_part} ${restaman}"
 		fi
@@ -296,7 +296,7 @@ case $OPCION1 in
 		;;
 		-r)  #log en TMP
 		inicio_detectar_discos  2>/dev/null 
-		echo "${restipo}"  > $TMP/particiones
+		echo "${respart}"  > $TMP/particiones
 		echo "${restipo}"  > $TMP/tipo_part
 		echo "${restaman}" > $TMP/taman_part
 		echo ""
